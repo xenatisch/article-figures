@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2026 Pouria Hadjibagheri. All rights reserved.
+
+Interactive timeline figure showing the 2009–2026 consolidation of Iranian regime power and key elimination/repression/war events.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Narrowing — Iranian Power Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#f7f4ee;font-family:'Source Sans 3',sans-serif;color:#1a1814}
+.page{max-width:800px;margin:0 auto;padding:0 24px 56px}
+.masthead{border-top:2.5px solid #1a1814;border-bottom:1px solid #c0bbb2;padding:7px 0 6px;margin-bottom:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase}
+.headline{padding:18px 0 15px;border-bottom:1px solid #c0bbb2;margin-bottom:28px}
+.kicker{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#8b1a1a;margin-bottom:6px}
+h1{font-size:26px;font-weight:600;line-height:1.15;color:#000;margin-bottom:10px}
+.deck{font-size:13px;font-weight:300;line-height:1.65;color:#3d3a34;max-width:580px}
+.canvas-wrap{position:relative}
+canvas{display:block;width:100%;cursor:default}
+.hover-hint{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9e9b95;margin:6px 0 0;text-align:center}
+#detail-panel{
+  display:none;
+  position:absolute;
+  bottom:100%;
+  left:0; right:0;
+  background:#1a1814;
+  border-top:1px solid #333;
+  border-left:4px solid #8b1a1a;
+  padding:14px 18px 16px;
+  font-family:'Source Sans 3',sans-serif;
+  z-index:10;
+}
+#detail-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px}
+#detail-sub{font-size:8.5px;font-family:'IBM Plex Mono',monospace;color:#888;letter-spacing:.04em;margin-bottom:10px}
+#detail-body{font-size:11px;font-weight:300;color:#c8c4bc;line-height:1.65;max-width:620px}
+#detail-close{position:absolute;top:10px;right:14px;font-size:11px;color:#666;cursor:pointer;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em}
+#detail-close:hover{color:#aaa}
+#tip{display:none}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="masthead">The Narrowing — Iranian Power Structure</div>
+<div class="headline">
+  <div class="kicker">Timeline Analysis · Islamic Republic Regime · 2009–2026</div>
+  <h1>From Arbitration to Consolidation</h1>
+  <p class="deck">How the elimination of brokers and mediators concentrated power in the three-man core — and made the system more dangerous, not less.</p>
+</div>
+<div class="canvas-wrap">
+  <div id="detail-panel">
+    <span id="detail-close">ESC ✕</span>
+    <div id="detail-title"></div>
+    <div id="detail-sub"></div>
+    <div id="detail-body"></div>
+  </div>
+  <canvas id="c"></canvas>
+  <p class="hover-hint">↑ Hover any marker for analysis</p>
+</div>
+</div>
+<div id="tip"></div>
+<script>
+(function(){
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const DPR = window.devicePixelRatio || 1;
+const W = 752, H = 560;
+canvas.width  = W * DPR;
+canvas.height = H * DPR;
+canvas.style.height = H + 'px';
+ctx.scale(DPR, DPR);
+
+const BG = '#f7f4ee', INK = '#1a1814', MUTED = '#9e9b95', RULE = '#c0bbb2';
+const CG = '#b06000', CE = '#1e4f8a', CV = '#1a4a2e';
+const TYPE_COL = {
+  eliminated: '#8b1a1a',
+  repression: '#c47d00',
+  milestone:  '#3a3835',
+  war:        '#2a5070',
+};
+
+// ── Split axis ────────────────────────────────────────────────
+const TL_LEFT = 92, TL_RIGHT = W - 30, TL_W = TL_RIGHT - TL_LEFT;
+const SEG = [
+  { from:2009, to:2014,   frac:0.30, x0:0    },
+  { from:2014, to:2019,   frac:0.08, x0:0.30 },
+  { from:2019, to:2026.6, frac:0.62, x0:0.38 },
+];
+function xOf(year) {
+  for (let i = 0; i < SEG.length; i++) {
+    const s = SEG[i];
+    if (year <= s.to || i === SEG.length-1) {
+      const t = Math.max(0, Math.min(1, (year - s.from) / (s.to - s.from)));
+      return TL_LEFT + (s.x0 + t * s.frac) * TL_W;
+    }
+  }
+  return TL_RIGHT;
+}
+
+const AXIS_Y = 78;
+
+// ── Principal role lanes ──────────────────────────────────────
+const LANE_TOP = 116, ROW_H = 20, ROW_GAP = 3, LANE_PAD = 14;
+const PRINCIPALS = [
+  { id:'G', label:'Ghalibaf', col:CG, roles:[
+    { from:2009,   to:2017,   label:'Tehran Mayor',          row:0, solid:true  },
+    { from:2019.5, to:2026.6, label:'Parliament Speaker',    row:0, solid:true  },
+    { from:2021,   to:2026.6, label:'SNSC Member',           row:1, solid:true  },
+    { from:2021,   to:2026.6, label:'Expediency Council',    row:2, solid:true  },
+  ]},
+  { id:'E', label:"Mohseni-Eje'i", col:CE, roles:[
+    { from:2009,   to:2009.6,  label:'Intelligence Min.',    row:0, solid:true  },
+    { from:2009.6, to:2014,    label:'Prosecutor-General',   row:0, solid:true  },
+    { from:2014,   to:2021,    label:'Dep. Judiciary head',  row:0, solid:true  },
+    { from:2021,   to:2026.6,  label:'Judiciary Chief',      row:0, solid:true  },
+    { from:2021,   to:2026.6,  label:'SNSC Member',          row:1, solid:true  },
+    { from:2026.08,to:2026.6,  label:'Interim Council',      row:2, solid:true  },
+  ]},
+  { id:'V', label:'Vahidi', col:CV, roles:[
+    { from:2009,   to:2013,   label:'Defence Minister',      row:0, solid:true  },
+    { from:2013,   to:2021,   label:'IRGC / senior defence', row:0, solid:false },
+    { from:2021,   to:2026.6, label:'Interior Minister',     row:0, solid:true  },
+    { from:2021,   to:2026.6, label:'SNSC Member',           row:1, solid:true  },
+    { from:2024,   to:2026.6, label:'IRGC Commander',        row:2, solid:true  },
+  ]},
+];
+let yRunner = LANE_TOP;
+PRINCIPALS.forEach(p => {
+  const maxRow = Math.max(...p.roles.map(r => r.row));
+  p.yTop = yRunner;
+  p.yBot = yRunner + (maxRow+1)*(ROW_H+ROW_GAP) - ROW_GAP;
+  p.yCen = (p.yTop + p.yBot) / 2;
+  yRunner = p.yBot + LANE_PAD;
+});
+const LANE_BOTTOM = yRunner + 6;
+
+// ── Events ────────────────────────────────────────────────────
+// War events: drawn at top, each with explicit pixel labelX
+// Standard events: drawn below lanes, labels auto-placed
+// Each event also carries an explicit dotX/dotY if in dense cluster
+
+const EVT_DOT_Y = LANE_BOTTOM + 28; // baseline dot row
+
+// All events. Dense 2026 cluster gets explicit dotY offsets (staggered).
+// labelX/labelY are computed below — NOT stored here.
+const EVENTS = [
+  { year:2009.5,  type:'repression',
+    title:'2009 Green Movement',
+    sub:'First convergence · all three sanctioned EU + US',
+    body:"First simultaneous convergence of all three. Ghalibaf coordinates street suppression, Eje'i runs the detention pipeline, Vahidi enters as Defence Minister mid-crackdown. All three subsequently sanctioned by EU and US." },
+
+  { year:2020.04, type:'eliminated',
+    title:'Soleimani killed',
+    sub:'3 January 2020 — US drone strike, Baghdad',
+    body:"US drone strike kills the Quds Force commander. Vahidi had built the Quds Force from scratch; Soleimani ran it for two decades. His death removes the most capable node in the outer network." },
+
+  { year:2021.65, type:'milestone',
+    title:'Raisi Government',
+    sub:'August 2021 — all three converge on SNSC',
+    body:"For the first time, all three axes of the coercive state are simultaneously controlled by IRGC-rooted figures. Ghalibaf as Speaker. Eje'i as Judiciary Chief. Vahidi as Interior Minister. All three on the SNSC." },
+
+  { year:2022.75, type:'repression',
+    title:'Mahsa (Jina) Amini uprising',
+    sub:'"Woman, Life, Freedom" — 500+ killed',
+    body:"Full coercive lockstep for the first time. Legislative cover from Ghalibaf, judicial no-leniency from Eje'i, LEC command chain held intact by Vahidi. Three pillars operating as one." },
+
+  { year:2024.4,  type:'eliminated',
+    title:'Raisi killed',
+    sub:'Helicopter crash, May 2024',
+    body:"President Raisi dies in a helicopter crash. Removes another outer node. The system absorbs it without structural change — the three principals hold. The first sign that the inner core is self-sufficient." },
+
+  // War events — rendered at top, explicit label positions
+  { year:2025.45, type:'war', isWar:true,
+    title:'12-Day War',
+    sub:'June 2025 — Israeli strikes on Iran',
+    body:"Israel strikes Iran in a sustained air campaign. IRGC Commander-in-Chief Hossein Salami killed. Vahidi emerges as effective IRGC commander. The war accelerates the narrowing already underway." },
+
+  { year:2026.12, type:'war', isWar:true,
+    title:'US-Israeli campaign',
+    sub:'Feb 2026 — sustained strikes',
+    body:"Sustained US-Israeli strikes on Iranian military infrastructure, nuclear sites, and command nodes. The war compresses all dynamics — removing the regime's ability to manage the internal instability it has already been forced to reveal." },
+
+  // 2026 dense cluster — staggered dots, labels fanned left and right
+  { year:2026.0,  type:'repression', cluster:true, dotYOff:0,
+    title:'Jan 2026 massacre',
+    sub:'Over 30,000 killed',
+    body:"The terminal repression event. Eje'i: 'If we want to do something, we have to do it fast.' Ghalibaf provides parliamentary cover. Vahidi holds the IRGC command chain. Over 30,000 killed in the opening weeks." },
+
+  { year:2026.08, type:'eliminated', cluster:true, dotYOff:22,
+    title:'Khamenei killed',
+    sub:'28 February 2026 — Israeli strike',
+    body:"The ultimate arbiter eliminated. The one figure who could hold competing factions in equilibrium is gone. The system no longer has an apex mediator. What remains is the hard core." },
+
+  { year:2026.22, type:'eliminated', cluster:true, dotYOff:44,
+    title:'Larijani killed',
+    sub:'17 March 2026 — Israeli strike',
+    body:"The last mediator gone. Larijani translated hardline positions into language Western foreign ministers could engage with. That service is now gone entirely." },
+
+  { year:2026.35, type:'milestone', cluster:true, dotYOff:66,
+    title:'Mojtaba Khamenei installed',
+    sub:'March 2026',
+    body:"Ghalibaf, Vahidi and Taeb as principal campaigners. Eje'i holds sovereign authority on the Interim Leadership Council. A cartel installing a controllable placeholder while real power sits one step removed." },
+];
+
+// Pre-compute x for all events
+EVENTS.forEach(e => { e._x = xOf(e.year); });
+
+// ── War label positions — text only, no pill, open away from each other ──
+// War1 x≈668: label right-aligned just left of line
+// War2 x≈703: label left-aligned just right of line
+const WAR_Y = 20;
+const WAR_LABEL_YS = [16, 36];
+EVENTS.filter(e=>e.isWar).forEach((e, i) => {
+  if (i === 0) {
+    e._warAlign  = 'right';   // war1: text opens leftward
+    e._warLabelX = e._x - 6;
+  } else {
+    e._warAlign  = 'left';    // war2: text opens rightward into right margin
+    e._warLabelX = e._x + 6;
+  }
+  e._warLabelY = WAR_LABEL_YS[i];
+});
+
+// ── Cluster label positions — all fanned to the left, unique y rows ──
+// Labels spread across x=400–670, each on its own descending y row below dots.
+const CLUSTER_LBL_XS  = [560, 460, 560, 460]; // two alternating columns, all left of dot cluster
+const CLUSTER_LBL_ROW_H = 30;
+
+EVENTS.filter(e=>e.cluster).forEach((e, i) => {
+  e._dotX = e._x;
+  e._dotY = EVT_DOT_Y + e.dotYOff;
+  e._lblX    = CLUSTER_LBL_XS[i];
+  // Rows 0 and 2 share x=560; rows 1 and 3 share x=460.
+  // Give each its own y, spaced enough that same-column labels don't touch.
+  e._lblY    = EVT_DOT_Y + i * CLUSTER_LBL_ROW_H + 22;
+  e._lblAlign = 'center';
+});
+
+// ── Standard event label placement ───────────────────────────
+// Place labels above or below EVT_DOT_Y, one per vertical slot.
+// Slots: levels 0,1,2... above and below. Each level = 28px further from dot row.
+// Greedy left-to-right assignment.
+const LBL_LEVEL_H = 26, LBL_SLOT_W = 90;
+const slots = { up:[], down:[] };
+EVENTS.filter(e => !e.isWar && !e.cluster).forEach(e => {
+  const x1 = e._x - LBL_SLOT_W/2, x2 = e._x + LBL_SLOT_W/2;
+  let placed = false;
+  for (let lvl = 0; lvl < 8 && !placed; lvl++) {
+    for (const dir of ['up','down']) {
+      if (!slots[dir][lvl]) slots[dir][lvl] = [];
+      if (slots[dir][lvl].every(([a,b]) => x2+4 < a || x1-4 > b)) {
+        slots[dir][lvl].push([x1, x2]);
+        e._lblDir = dir;
+        e._lblLvl = lvl;
+        placed = true;
+        break;
+      }
+    }
+  }
+  if (!placed) { e._lblDir = 'down'; e._lblLvl = 7; }
+});
+
+let activeEvent = null;
+
+// ── Draw helpers ──────────────────────────────────────────────
+function wrapText(text, x, y, maxW, lineH, anchor) {
+  const words = text.split(' '), lines = []; let cur = '';
+  words.forEach(w => {
+    const t = cur ? cur+' '+w : w;
+    if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+  });
+  if (cur) lines.push(cur);
+  const ls = lines.slice(0, 3);
+  if (anchor === 'bottom') ls.reverse();
+  const sign = anchor === 'bottom' ? -1 : 1;
+  ls.forEach((l, i) => ctx.fillText(l, x, y + sign * i * lineH));
+}
+
+// ── Draw ──────────────────────────────────────────────────────
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+
+  // ── Axis ──
+  const breakX1 = xOf(2014), breakX2 = xOf(2019);
+  ctx.strokeStyle = RULE; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(TL_LEFT, AXIS_Y); ctx.lineTo(breakX1-2, AXIS_Y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(breakX2+2, AXIS_Y); ctx.lineTo(TL_RIGHT, AXIS_Y); ctx.stroke();
+
+  // break zigzag
+  const bx = (breakX1+breakX2)/2;
+  ctx.save(); ctx.strokeStyle = MUTED; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(bx-8,AXIS_Y-5); ctx.lineTo(bx-3,AXIS_Y+5); ctx.lineTo(bx+3,AXIS_Y-5); ctx.lineTo(bx+8,AXIS_Y+5); ctx.stroke();
+  ctx.font="400 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('2014 – 2019', bx, AXIS_Y+8); ctx.restore();
+
+  [2009,2010,2011,2012,2013,2014,2019,2020,2021,2022,2023,2024,2025,2026].forEach(y => {
+    const x = xOf(y);
+    ctx.beginPath(); ctx.moveTo(x,AXIS_Y-3); ctx.lineTo(x,AXIS_Y+3); ctx.strokeStyle=RULE; ctx.lineWidth=1; ctx.stroke();
+    ctx.font="400 8.5px 'IBM Plex Mono',monospace"; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText(y, x, AXIS_Y-6);
+  });
+
+  // narrowing tint
+  const nX1 = xOf(2019.8), nX2 = xOf(2026.6);
+  ctx.save(); ctx.globalAlpha=0.04; ctx.fillStyle=TYPE_COL.eliminated;
+  ctx.fillRect(nX1, AXIS_Y+1, nX2-nX1, EVT_DOT_Y+80-AXIS_Y); ctx.restore();
+  ctx.save(); ctx.font="500 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle='rgba(139,26,26,0.28)';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('THE NARROWING', (nX1+nX2)/2, AXIS_Y+6); ctx.restore();
+
+  // ── Principal lanes ──
+  PRINCIPALS.forEach(p => {
+    ctx.font="600 10px 'Source Sans 3',sans-serif";
+    ctx.fillStyle=p.col; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(p.label, TL_LEFT-8, p.yCen);
+
+    p.roles.forEach(role => {
+      const x1=xOf(role.from), x2=xOf(role.to), bw=x2-x1;
+      if (bw<1) return;
+      const yTop = p.yTop + role.row*(ROW_H+ROW_GAP);
+      const bh   = ROW_H - (role.row>0 ? 2 : 0);
+      ctx.save();
+      ctx.globalAlpha = role.solid ? 0.68 : 0.16;
+      ctx.fillStyle = p.col;
+      ctx.beginPath(); ctx.roundRect(x1, yTop, bw, bh, 2); ctx.fill();
+      if (!role.solid) {
+        ctx.globalAlpha = 0.3; ctx.strokeStyle=p.col; ctx.lineWidth=1;
+        ctx.setLineDash([4,4]); ctx.beginPath(); ctx.roundRect(x1,yTop,bw,bh,2); ctx.stroke(); ctx.setLineDash([]);
+      }
+      ctx.restore();
+      if (role.solid) {
+        ctx.save();
+        ctx.font = "300 7.5px 'Source Sans 3',sans-serif";
+        ctx.globalAlpha = 0.88;
+        if (bw > 32) {
+          // label inside bar
+          ctx.fillStyle = '#fff';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          let lbl = role.label;
+          while (ctx.measureText(lbl).width > bw-6 && lbl.length > 5) lbl = lbl.slice(0,-4)+'…';
+          ctx.fillText(lbl, x1+bw/2, yTop+bh/2);
+        } else {
+          // bar too narrow — label outside; left side if bar starts near left edge, else right
+          const goLeft = x1 < TL_LEFT + 60;
+          ctx.fillStyle = p.col;
+          ctx.textAlign = goLeft ? 'right' : 'left';
+          ctx.textBaseline = 'middle';
+          const lx = goLeft ? x1-5 : x2+5;
+          // split into two lines if label has multiple words
+          const words = role.label.split(' ');
+          if (words.length > 1) {
+            const mid = Math.ceil(words.length / 2);
+            const l1 = words.slice(0, mid).join(' ');
+            const l2 = words.slice(mid).join(' ');
+            ctx.fillText(l1, lx, yTop + bh/2 - 4);
+            ctx.fillText(l2, lx, yTop + bh/2 + 5);
+          } else {
+            ctx.fillText(role.label, lx, yTop + bh/2);
+          }
+          ctx.globalAlpha = 0.4;
+          ctx.strokeStyle = p.col; ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(goLeft ? x1 : x2, yTop+bh/2);
+          ctx.lineTo(goLeft ? x1-4 : x2+4, yTop+bh/2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    });
+  });
+
+  // ── War events at top — text only, no pill ──
+  EVENTS.filter(e=>e.isWar).forEach(ev => {
+    const x=ev._x, col=TYPE_COL.war, isActive=activeEvent===ev;
+    ctx.save();
+    // dashed vertical line from label down to axis
+    ctx.strokeStyle=col; ctx.lineWidth=isActive?1.5:0.9; ctx.globalAlpha=isActive?0.6:0.3;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x, ev._warLabelY+12); ctx.lineTo(x, AXIS_Y); ctx.stroke();
+    ctx.setLineDash([]);
+    // small horizontal tick
+    ctx.lineWidth=isActive?2:1.2; ctx.globalAlpha=isActive?0.75:0.4;
+    ctx.beginPath(); ctx.moveTo(x-5, ev._warLabelY+12); ctx.lineTo(x+5, ev._warLabelY+12); ctx.stroke();
+    // label text
+    ctx.globalAlpha=isActive?1:0.76;
+    ctx.font=`${isActive?600:500} 8px 'Source Sans 3',sans-serif`;
+    ctx.fillStyle=col; ctx.textAlign=ev._warAlign; ctx.textBaseline='alphabetic';
+    // split title at space nearest midpoint for two-line rendering
+    const titleWords = ev.title.split(' ');
+    const mid = Math.ceil(titleWords.length / 2);
+    const line1 = titleWords.slice(0, mid).join(' ');
+    const line2 = titleWords.slice(mid).join(' ');
+    if (line2) {
+      ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 5);
+      ctx.fillText(line2, ev._warLabelX, ev._warLabelY + 5 + 10);
+    } else {
+      ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 12);
+    }
+    ctx.font=`300 7px 'IBM Plex Mono',monospace`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
+    ctx.fillText(ev.sub.split('—')[0].trim(), ev._warLabelX, ev._warLabelY + (line2 ? 28 : 21));
+    ctx.restore();
+  });
+
+  // ── Standard events: drop lines ──
+  EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
+    const x=ev._x, col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=isActive?1.5:0.8; ctx.globalAlpha=isActive?0.7:0.32;
+    ctx.setLineDash(ev.type==='milestone'?[3,3]:[]);
+    ctx.beginPath(); ctx.moveTo(x,AXIS_Y+1); ctx.lineTo(x,EVT_DOT_Y-6); ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+  });
+
+  // ── Cluster: drop lines from axis to each dot ──
+  EVENTS.filter(e=>e.cluster).forEach(ev => {
+    const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=isActive?1.5:0.7; ctx.globalAlpha=isActive?0.65:0.28;
+    ctx.beginPath(); ctx.moveTo(ev._x, AXIS_Y+1); ctx.lineTo(ev._dotX, ev._dotY-6); ctx.stroke();
+    ctx.restore();
+  });
+
+  // ── Cluster: connector lines dot → label ──
+  EVENTS.filter(e=>e.cluster).forEach(ev => {
+    const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=0.6; ctx.globalAlpha=isActive?0.45:0.18;
+    ctx.setLineDash([2,3]);
+    ctx.beginPath();
+    ctx.moveTo(ev._dotX, ev._dotY);
+    ctx.lineTo(ev._dotX, ev._lblY);
+    ctx.lineTo(ev._lblX, ev._lblY);
+    ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+  });
+
+  // ── Standard: label connector lines if level>0 ──
+  EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
+    if ((ev._lblLvl||0) === 0) return;
+    const x=ev._x, col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+    const dotR=5, isUp=ev._lblDir==='up';
+    const lvlOff = dotR+6+(ev._lblLvl)*LBL_LEVEL_H;
+    const lblY = isUp ? EVT_DOT_Y-lvlOff : EVT_DOT_Y+lvlOff;
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=0.5; ctx.globalAlpha=isActive?0.4:0.16;
+    ctx.setLineDash([2,3]);
+    const ls=isUp?EVT_DOT_Y-dotR-2:EVT_DOT_Y+dotR+2, le=isUp?lblY+2:lblY-2;
+    ctx.beginPath(); ctx.moveTo(x,ls); ctx.lineTo(x,le); ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+  });
+
+  // ── All dots ──
+  const dotEvents = EVENTS.filter(e=>!e.isWar);
+  dotEvents.forEach(ev => {
+    const x  = ev.cluster ? ev._dotX : ev._x;
+    const y  = ev.cluster ? ev._dotY : EVT_DOT_Y;
+    const col= TYPE_COL[ev.type], isActive=activeEvent===ev, dotR=isActive?7:5;
+    ctx.save(); ctx.globalAlpha=isActive?1:0.82;
+    ctx.beginPath(); ctx.arc(x,y,dotR,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+    if (isActive) { ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke(); }
+    if (ev.type==='eliminated') {
+      ctx.font=`bold ${Math.round(dotR*.9)}px sans-serif`;
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('✕', x, y+0.5);
+    }
+    ctx.restore();
+  });
+
+  // ── Standard event labels ──
+  EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
+    const x=ev._x, col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+    const dotR=5, isUp=ev._lblDir==='up', lvl=ev._lblLvl||0;
+    const lvlOff=dotR+6+lvl*LBL_LEVEL_H;
+    const lblY=isUp?EVT_DOT_Y-lvlOff:EVT_DOT_Y+lvlOff;
+    const anchor=isUp?'bottom':'top';
+    ctx.save(); ctx.globalAlpha=isActive?1:0.72;
+    ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
+    ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline=anchor;
+    wrapText(ev.title, x, lblY, 82, 11, anchor);
+    ctx.restore();
+  });
+
+  // ── Cluster event labels ──
+  EVENTS.filter(e=>e.cluster).forEach(ev => {
+    const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+    ctx.save(); ctx.globalAlpha=isActive?1:0.75;
+    ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
+    ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline='middle';
+    wrapText(ev.title, ev._lblX, ev._lblY, 88, 11, 'middle-wrap');
+    ctx.restore();
+  });
+
+  // ── Legend ──
+  const legY = H - 30;
+  const legItems = [
+    { col:TYPE_COL.eliminated, label:'Eliminated ✕' },
+    { col:TYPE_COL.repression, label:'Repression event' },
+    { col:TYPE_COL.war,        label:'War' },
+    { col:TYPE_COL.milestone,  label:'Power milestone' },
+  ];
+  let lx = TL_LEFT;
+  legItems.forEach(it => {
+    ctx.beginPath(); ctx.arc(lx+5, legY, 4.5, 0, Math.PI*2);
+    ctx.fillStyle=it.col; ctx.fill();
+    ctx.font="300 9px 'Source Sans 3',sans-serif";
+    ctx.fillStyle=MUTED; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(it.label, lx+14, legY);
+    lx += ctx.measureText(it.label).width + 30;
+  });
+
+}
+
+// Override wrapText for cluster labels (right-aligned, multi-line from centre)
+const _wrapText = wrapText;
+function wrapText(text, x, y, maxW, lineH, anchor) {
+  if (anchor === 'middle-wrap') {
+    const words=text.split(' '), lines=[]; let cur='';
+    ctx.textBaseline='middle';
+    words.forEach(w=>{ const t=cur?cur+' '+w:w; if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else cur=t; });
+    if(cur)lines.push(cur);
+    const ls=lines.slice(0,3), th=(ls.length-1)*lineH;
+    ls.forEach((l,i)=>ctx.fillText(l,x,y-th/2+i*lineH));
+    return;
+  }
+  const words=text.split(' '), lines=[]; let cur='';
+  words.forEach(w=>{ const t=cur?cur+' '+w:w; if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else cur=t; });
+  if(cur)lines.push(cur);
+  const ls=lines.slice(0,3);
+  if(anchor==='bottom') ls.reverse();
+  const sign=anchor==='bottom'?-1:1;
+  ls.forEach((l,i)=>ctx.fillText(l,x,y+sign*i*lineH));
+}
+
+// ── Interaction ───────────────────────────────────────────────
+const panel      = document.getElementById('detail-panel');
+const panelTitle = document.getElementById('detail-title');
+const panelSub   = document.getElementById('detail-sub');
+const panelBody  = document.getElementById('detail-body');
+const panelClose = document.getElementById('detail-close');
+
+function showPanel(ev) {
+  panelTitle.textContent = ev.title;
+  panelSub.textContent   = ev.sub;
+  panelBody.textContent  = ev.body;
+  panel.style.borderLeftColor = TYPE_COL[ev.type];
+  panel.style.display = 'block';
+}
+function hidePanel() {
+  panel.style.display = 'none';
+  activeEvent = null;
+  draw();
+}
+
+panelClose.addEventListener('click', hidePanel);
+document.addEventListener('keydown', e => { if(e.key==='Escape') hidePanel(); });
+
+canvas.addEventListener('mousemove', ev => {
+  const rect=canvas.getBoundingClientRect();
+  const mx=(ev.clientX-rect.left)*(W/rect.width);
+  const my=(ev.clientY-rect.top)*(H/rect.height);
+  let hit=null;
+  EVENTS.forEach(e => {
+    if (e.isWar) {
+      if (Math.abs(mx-e._x)<12 && my>=e._warLabelY && my<=AXIS_Y) hit=e;
+    } else if (e.cluster) {
+      if (Math.hypot(mx-e._dotX, my-e._dotY)<10) hit=e;
+    } else {
+      if (Math.hypot(mx-e._x, my-EVT_DOT_Y)<10) hit=e;
+    }
+  });
+  if (hit!==activeEvent) {
+    activeEvent=hit;
+    draw();
+    if (hit) showPanel(hit); else hidePanel();
+  }
+  canvas.style.cursor = hit?'pointer':'default';
+});
+canvas.addEventListener('mouseleave',()=>{
+  // don't hide on mouseleave — let user read the panel
+  canvas.style.cursor='default';
+});
+
+draw();
+})();
+</script>
+</body>
+</html>

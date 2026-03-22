@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2026 Pouria Hadjibagheri. All rights reserved.
+
+Interactive comparison figure mapping the three principal actors across origins, institutions, repression, and succession dynamics.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Architects of Continuity</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f7f4ee; font-family: 'Source Sans 3', sans-serif; color: #1a1814; font-size: 15px; }
+.page { max-width: 800px; margin: 0 auto; padding: 0 24px 60px; }
+
+.masthead { border-top: 2.5px solid #1a1814; border-bottom: 1px solid #c0bbb2; padding: 7px 0 6px; margin-bottom: 4px; font-family: 'Playfair Display', serif; font-size: 10px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+.headline { padding: 18px 0 15px; border-bottom: 1px solid #c0bbb2; margin-bottom: 20px; }
+.kicker { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: #8b1a1a; margin-bottom: 6px; }
+h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1.1; color: #000; margin-bottom: 10px; }
+.deck { font-size: 13.5px; font-weight: 300; line-height: 1.65; color: #3d3a34; max-width: 600px; }
+
+.legend-wrap { margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #c0bbb2; }
+.legend-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+.legend-row:last-child { margin-bottom: 0; }
+.li { display: flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: .1em; text-transform: uppercase; color: #7a776f; }
+.ldot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.dg { background: #b06000; } .de { background: #1e4f8a; } .dv { background: #1a4a2e; }
+.kill-leg { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #8b1a1a; font-size: 7.5px; font-weight: 700; color: #8b1a1a; background: #f5dede; }
+.swatch { width: 16px; height: 11px; border-radius: 2px; flex-shrink: 0; border: 1px solid rgba(0,0,0,.12); }
+.sw-inst { background: #eef3f8; } .sw-rep { background: #fdf0ef; } .sw-succ { background: #f0eeff; } .sw-plain { background: #f7f4ee; border-color: #c0bbb2; }
+
+.hint { display: flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #4a4844; margin-bottom: 20px; font-weight: 500; }
+.hint-icon { width: 24px; height: 24px; border: 2px solid #9e9b95; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #4a4844; animation: pulse 2.5s ease-in-out infinite; flex-shrink: 0; }
+@keyframes pulse { 0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
+
+/* ── GRID ── */
+/* 4 columns: label (220px) | G | E | V */
+.grid { border: none; }
+
+.col-heads {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr 1fr;
+  border-bottom: 1px solid #c0bbb2;
+  position: sticky; top: 0; background: #f7f4ee; z-index: 20;
+}
+.ch-label { padding: 12px 14px 10px; }
+.ch { padding: 12px 14px 10px; border-bottom: 3px solid #c0bbb2; }
+.ch:last-child { border-right: none; }
+.ch.cg { border-color: #b06000; }
+.ch.ce { border-color: #1e4f8a; }
+.ch.cv { border-color: #1a4a2e; }
+.ch-name { font-size: 12.5px; font-weight: 600; color: #1a1814; display: block; line-height: 1.25; }
+.ch-role { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a776f; margin-top: 3px; display: block; }
+
+/* section header */
+.sec {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr 1fr;
+  background: #e4e0d6;
+  border-bottom: 1px solid #c0bbb2;
+}
+.sec-label {
+  padding: 8px 14px 7px;
+  font-size: 14px; font-weight: 600; color: #1a1814;
+  display: flex; align-items: center; gap: 9px;
+}
+.sec-pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.sec-col { }
+
+/* ── ROW ── */
+/*
+  Each data row is a 4-col grid.
+  The label cell is always plain.
+  The three principal cells each carry their section's spine colour as border-left.
+  This border runs on EVERY cell (empty or not) within a section → continuous spine.
+
+  Spine colours by section:
+    Origins / institutions / intermediaries: principal colour (amber/blue/green)
+    Repression: red  #8b1a1a  (all three columns)
+    Succession:  purple #3a2870 (all three columns)
+*/
+.row {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr 1fr;
+  border-bottom: 1px solid #ece8e0;
+}
+
+/* row background tints */
+.row.bg-inst { background: #eef3f8; }
+.row.bg-rep  { background: #fdf0ef; }
+.row.bg-succ { background: #f0eeff; }
+/* plain = default #f7f4ee via body */
+
+/* label cell */
+.lbl {
+  padding: 11px 14px;
+  vertical-align: top;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+  overflow: hidden;
+}
+.lbl-name {
+  font-size: 13px; font-weight: 600; color: #2a2824;
+  display: block; line-height: 1.3; margin-bottom: 3px;
+}
+.lbl-name.rep  { color: #7a1414; }
+.lbl-name.kill { opacity: .62; }
+.lbl-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; color: #7a776f;
+  display: block; line-height: 1.4;
+}
+.lbl-kill { display: inline-flex; align-items: center; gap: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; color: #8b1a1a; margin-top: 4px; }
+.lbl-kill::before { content: '✕'; display: inline-flex; align-items: center; justify-content: center; width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid #8b1a1a; background: #f5dede; font-size: 6.5px; font-weight: 700; }
+
+/* principal cells */
+.cell {
+  cursor: pointer;
+  transition: filter .1s;
+  position: relative;
+}
+.cell:last-child { }
+.cell.empty { cursor: default; }
+.cell:not(.empty):hover { filter: brightness(.95); }
+.cell.active { filter: brightness(.92); }
+
+/*
+  SPINE = left border on every principal cell, always.
+  Per-section colour applied via section wrapper classes on the row.
+  Principal-coloured spines:
+*/
+.row.sec-orig .cell.col-g,
+.row.sec-int  .cell.col-g,
+.row.sec-inst .cell.col-g,
+.row.sec-succ .cell.col-g  { border-left: 3px solid #b06000; }
+
+.row.sec-orig .cell.col-e,
+.row.sec-int  .cell.col-e,
+.row.sec-inst .cell.col-e,
+.row.sec-succ .cell.col-e  { border-left: 3px solid #1e4f8a; }
+
+.row.sec-orig .cell.col-v,
+.row.sec-int  .cell.col-v,
+.row.sec-inst .cell.col-v,
+.row.sec-succ .cell.col-v  { border-left: 3px solid #1a4a2e; }
+
+/* Repression — red spine on all three columns */
+.row.sec-rep .cell.col-g,
+.row.sec-rep .cell.col-e,
+.row.sec-rep .cell.col-v   { border-left: 3px solid #8b1a1a; }
+
+/* cell content */
+.cell-inner { padding: 10px 13px 10px 17px; position: relative; min-height: 52px; }
+
+/* Bullet — only on non-empty cells */
+.cell:not(.empty) .cell-inner::before {
+  content: '';
+  position: absolute;
+  left: -6px; top: 16px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  z-index: 2;
+}
+/* principal-coloured bullets */
+.row.sec-orig .cell.col-g:not(.empty) .cell-inner::before,
+.row.sec-int  .cell.col-g:not(.empty) .cell-inner::before,
+.row.sec-inst .cell.col-g:not(.empty) .cell-inner::before,
+.row.sec-succ .cell.col-g:not(.empty) .cell-inner::before
+  { background: #b06000; box-shadow: 0 0 0 2.5px #f7f4ee; }
+
+.row.sec-orig .cell.col-e:not(.empty) .cell-inner::before,
+.row.sec-int  .cell.col-e:not(.empty) .cell-inner::before,
+.row.sec-inst .cell.col-e:not(.empty) .cell-inner::before,
+.row.sec-succ .cell.col-e:not(.empty) .cell-inner::before
+  { background: #1e4f8a; box-shadow: 0 0 0 2.5px #f7f4ee; }
+
+.row.sec-orig .cell.col-v:not(.empty) .cell-inner::before,
+.row.sec-int  .cell.col-v:not(.empty) .cell-inner::before,
+.row.sec-inst .cell.col-v:not(.empty) .cell-inner::before,
+.row.sec-succ .cell.col-v:not(.empty) .cell-inner::before
+  { background: #1a4a2e; box-shadow: 0 0 0 2.5px #f7f4ee; }
+
+/* repression red bullets */
+.row.sec-rep .cell:not(.empty) .cell-inner::before
+  { background: #8b1a1a; box-shadow: 0 0 0 2.5px #fdf0ef; }
+
+/* bullet background halo matches row bg */
+.row.bg-inst .cell:not(.empty) .cell-inner::before { box-shadow: 0 0 0 2.5px #eef3f8; }
+.row.bg-succ .cell:not(.empty) .cell-inner::before { box-shadow: 0 0 0 2.5px #f0eeff; }
+
+/* badges */
+.badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+.badge { font-family: 'IBM Plex Mono', monospace; font-size: 8px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; display: inline-block; }
+.bg   { background: #fde8c8; color: #5a3004; }
+.be   { background: #ddeaf8; color: #0a2850; }
+.bv   { background: #d8f0e4; color: #082216; }
+.brep { background: #f5dede; color: #4a0c0c; }
+.bneu { background: #e0dbd4; color: #2e2c29; }
+.binf { background: #dedad4; color: #1a1814; }
+.bsucc{ background: #dedad4; color: #1a1814; }
+.bsanc{ background: #fff0cc; color: #5a3800; border: 1px solid #d4a030; }
+
+/* cell description text */
+.c-desc { font-size: 11.5px; font-weight: 400; color: #4a4844; display: block; line-height: 1.5; }
+
+/* ── BANDS — for all-three-connected nodes ── */
+/* Bands are also 4-col */
+.band {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr 1fr;
+  border-bottom: 1px solid #ece8e0;
+  cursor: pointer;
+  transition: filter .1s;
+}
+.band:hover  { filter: brightness(.96); }
+.band.active { filter: brightness(.93); }
+
+.band-lbl {
+  padding: 11px 14px;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+  overflow: hidden;
+}
+.band-name { font-size: 13px; font-weight: 600; color: #2a2824; display: block; line-height: 1.3; margin-bottom: 3px; }
+.band-sub  { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a776f; display: block; line-height: 1.4; }
+.band-kill { display: inline-flex; align-items: center; gap: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; color: #8b1a1a; margin-top: 4px; }
+.band-kill::before { content: '✕'; display: inline-flex; align-items: center; justify-content: center; width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid #8b1a1a; background: #f5dede; font-size: 6.5px; font-weight: 700; }
+
+.band-cell {
+  padding: 10px 13px 10px 17px;
+  font-size: 11.5px; font-weight: 400; line-height: 1.5;
+  color: #4a4844;
+  position: relative;
+}
+.band-cell:last-child { }
+.band-cell .badges { margin-bottom: 5px; }
+
+/*
+  Band spines — each band declares its section via a class on .band
+  Spine runs on each band-cell's left border.
+*/
+.band.sec-int  .band-cell.col-g { border-left: 3px solid #b06000; }
+.band.sec-int  .band-cell.col-e { border-left: 3px solid #1e4f8a; }
+.band.sec-int  .band-cell.col-v { border-left: 3px solid #1a4a2e; }
+.band.sec-inst .band-cell.col-g { border-left: 3px solid #b06000; }
+.band.sec-inst .band-cell.col-e { border-left: 3px solid #1e4f8a; }
+.band.sec-inst .band-cell.col-v { border-left: 3px solid #1a4a2e; }
+.band.sec-succ .band-cell.col-g { border-left: 3px solid #b06000; }
+.band.sec-succ .band-cell.col-e { border-left: 3px solid #1e4f8a; }
+.band.sec-succ .band-cell.col-v { border-left: 3px solid #1a4a2e; }
+
+/* Band bullets */
+.band-cell::before {
+  content: '';
+  position: absolute;
+  left: -6px; top: 16px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  z-index: 2;
+}
+.band.sec-int  .band-cell.col-g::before,
+.band.sec-inst .band-cell.col-g::before,
+.band.sec-succ .band-cell.col-g::before { background: #b06000; box-shadow: 0 0 0 2.5px #f7f4ee; }
+.band.sec-int  .band-cell.col-e::before,
+.band.sec-inst .band-cell.col-e::before,
+.band.sec-succ .band-cell.col-e::before { background: #1e4f8a; box-shadow: 0 0 0 2.5px #f7f4ee; }
+.band.sec-int  .band-cell.col-v::before,
+.band.sec-inst .band-cell.col-v::before,
+.band.sec-succ .band-cell.col-v::before { background: #1a4a2e; box-shadow: 0 0 0 2.5px #f7f4ee; }
+
+/* institution bands — blue halo */
+.band.bg-inst .band-cell.col-g::before { box-shadow: 0 0 0 2.5px #eef3f8; }
+.band.bg-inst .band-cell.col-e::before { box-shadow: 0 0 0 2.5px #eef3f8; }
+.band.bg-inst .band-cell.col-v::before { box-shadow: 0 0 0 2.5px #eef3f8; }
+.band.bg-succ .band-cell.col-g::before { box-shadow: 0 0 0 2.5px #f0eeff; }
+.band.bg-succ .band-cell.col-e::before { box-shadow: 0 0 0 2.5px #f0eeff; }
+.band.bg-succ .band-cell.col-v::before { box-shadow: 0 0 0 2.5px #f0eeff; }
+
+/* band bg tints */
+.band.bg-inst { background: #eef3f8; }
+.band.bg-succ { background: #f0eeff; }
+.band.bg-orig { background: #eef3f8; }
+/* plain = #f7f4ee */
+
+/* Origins band has no label column spine, just section spine */
+.band.sec-orig .band-cell.col-g { border-left: 3px solid #b06000; }
+.band.sec-orig .band-cell.col-e { border-left: 3px solid #1e4f8a; }
+.band.sec-orig .band-cell.col-v { border-left: 3px solid #1a4a2e; }
+.band.sec-orig .band-cell.col-g::before { background: #b06000; box-shadow: 0 0 0 2.5px #eef3f8; }
+.band.sec-orig .band-cell.col-e::before { background: #1e4f8a; box-shadow: 0 0 0 2.5px #eef3f8; }
+.band.sec-orig .band-cell.col-v::before { background: #1a4a2e; box-shadow: 0 0 0 2.5px #eef3f8; }
+
+/* tooltip */
+#tip { position: fixed; z-index: 9999; width: 320px; background: #1a1814; color: #f0ece3; border-radius: 3px; padding: 13px 15px; font-size: 11.5px; line-height: 1.68; font-weight: 300; pointer-events: none; box-shadow: 0 6px 28px rgba(0,0,0,.55); display: none; font-family: 'Source Sans 3', sans-serif; }
+#tip strong { font-weight: 600; font-size: 13px; display: block; margin-bottom: 5px; color: #fff; }
+#tip em { font-style: normal; font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #888; display: block; margin-bottom: 8px; letter-spacing: .05em; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="masthead">Iranian Power Network — Analysis</div>
+<div class="headline">
+  <div class="kicker">Network Analysis · Islamic Republic Regime</div>
+  <h1>The Architects of Continuity</h1>
+  <p class="deck">Structural mapping of the networks connecting Ghalibaf, Mohseni-Eje'i and Vahidi. The label column names each node; the three principal columns show what each figure's connection to it was. Hover for analysis.</p>
+</div>
+
+<div class="legend-wrap">
+  <div class="legend-row">
+    <div class="li"><div class="ldot dg"></div>Ghalibaf</div>
+    <div class="li"><div class="ldot de"></div>Mohseni-Eje'i</div>
+    <div class="li"><div class="ldot dv"></div>Vahidi</div>
+    <div class="li"><div class="kill-leg">✕</div>Eliminated</div>
+    <div class="li"><span class="badge binf" style="font-size:8px;padding:2px 7px">Informal</span>Informal / indirect link</div>
+    <div class="li"><span class="badge bsanc" style="font-size:8px;padding:2px 7px">⚑ Sanctioned</span>Sanctions designation</div>
+  </div>
+  <div class="legend-row">
+    <div class="li"><div class="swatch sw-inst"></div>Institution or origin</div>
+    <div class="li"><div class="swatch sw-rep"></div>Repression event</div>
+    <div class="li"><div class="swatch sw-succ"></div>Succession</div>
+    <div class="li"><div class="swatch sw-plain"></div>Individual / intermediary</div>
+  </div>
+</div>
+
+<div class="hint"><div class="hint-icon">⌖</div><span>Hover any row for analysis</span></div>
+
+<div class="grid">
+
+<!-- column headers -->
+<div class="col-heads">
+  <div class="ch-label"></div>
+  <div class="ch cg"><span class="ch-name">Mohammad-Bagher Ghalibaf</span><span class="ch-role">Parliament Speaker · IRGC Brig. General</span><span class="ch-role" style="margin-top:3px"><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px">⚑ EU · US</span></span></div>
+  <div class="ch ce"><span class="ch-name">Gholam-Hossein Mohseni-Eje'i</span><span class="ch-role">Judiciary Chief · Interim Leadership Council</span><span class="ch-role" style="margin-top:3px"><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px">⚑ UK · EU · US</span></span></div>
+  <div class="ch cv"><span class="ch-name">Ahmad Vahidi</span><span class="ch-role">Interior Minister · IRGC Commander</span><span class="ch-role" style="margin-top:3px"><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px">⚑ EU · US · INTERPOL</span></span></div>
+</div>
+
+<!-- ═══════════════════ ORIGINS ═══════════════════ -->
+<div class="sec">
+  <div class="sec-label"><span class="sec-pip" style="background:#2a3a52"></span>Origins</div>
+  <div class="sec-col"></div><div class="sec-col"></div><div class="sec-col"></div>
+</div>
+
+<div class="band sec-orig bg-orig"
+  data-n="IRGC / MOIS Ecosystem"
+  data-r="Shared institutional formation, 1979–1988"
+  data-t="Before any of them held a civilian post, all three were shaped by the same institutional womb. Ghalibaf came up through the IRGC's air force and ground commands during the Iran-Iraq war. Vahidi ran IRGC intelligence. Eje'i is the anomaly — he came in through the judiciary, not the barracks — but the security doctrine he embedded in Iran's courts in the 1980s is IRGC doctrine dressed in robes. This shared formation is the deepest connection in the network. It pre-dates every co-membership, every cabinet appointment, every repression operation on record.">
+  <div class="band-lbl"><span class="band-name">IRGC / MOIS Ecosystem</span><span class="band-sub">Shared formation, 1979–1988</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge bg">IRGC Ground Cmdr</span></div>
+    Rises through IRGC air force and ground commands during the Iran-Iraq war
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">MOIS Judiciary Rep</span><span class="badge be">Interrogator</span></div>
+    Joins MOIS as interrogator on founding; Judiciary's Representative to MOIS 1986–88
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge bv">IRGC Intel Chief</span><span class="badge bv">MOIS Co-Founder</span></div>
+    IRGC intelligence chief; co-founds MOIS; builds the intelligence apparatus from scratch
+  </div>
+</div>
+
+</div>
+
+<!-- IRGC — institution row in Origins -->
+<div class="row sec-orig bg-inst"
+  data-n="Islamic Revolutionary Guard Corps (IRGC)"
+  data-r="Founded 1979 · Sanctioned EU · US · CA · AU"
+  data-t="The IRGC is not simply a military organisation. It is the governing class of the Islamic Republic — a parallel state with its own economic empire, intelligence apparatus, construction arm, and foreign legion. All three principals are career products of it. Ghalibaf and Vahidi came up through its uniformed ranks; Eje'i through its judicial proxy structures. The United States designated the IRGC a Foreign Terrorist Organisation in April 2019 — the first time Washington had applied that designation to a state military. Canada followed in June 2024. Australia has also designated it. The EU and UK have sanctioned the Quds Force and numerous IRGC individuals, but have stopped short of designating the IRGC as an entity. Britain has repeatedly debated proscription under the Terrorism Act 2000 but the current government has declined, preferring sanctions on individuals. That gap — between what allies have done and what Britain has not — is precisely the IRGC proscription argument.">
+  <div class="lbl"><span class="lbl-name">IRGC</span><span class="lbl-sub">Islamic Revolutionary Guard Corps</span><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px;margin-top:4px;display:block;align-self:flex-start">⚑ EU · US FTO · CA · AU</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bg">IRGC Aerospace Force Cmdr</span><span class="badge bg">LEC Commander</span></div>
+      <span class="c-desc">Rose through IRGC; commanded Aerospace Force; then Law Enforcement Command from 2000</span>
+    </div>
+  </div>
+  <div class="cell col-e">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge be">IRGC Judicial Proxy</span></div>
+      <span class="c-desc">Connected through MOIS and judiciary structures; not a uniformed IRGC member but part of its institutional ecosystem</span>
+    </div>
+  </div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bv">IRGC Intel Chief</span><span class="badge bv">Quds Force Founder</span><span class="badge bv">IRGC Commander</span></div>
+      <span class="c-desc">Career IRGC officer from 1979; founded Quds Force; now commands the entire corps</span>
+    </div>
+  </div>
+</div>
+
+<!-- Ali Khamenei row — plain bg (individual), part of Origins -->
+<div class="row sec-orig"
+  data-n="Ali Khamenei"
+  data-r="Supreme Leader, 1989–2026 · Killed Feb 2026"
+  data-t="All three principals owed their careers — and their survival — to Khamenei's patronage. He appointed Ghalibaf to the Law Enforcement Command after 1999, elevated Eje'i to the judiciary's top posts, and gave Vahidi the political cover to return from international isolation after the AMIA bombing indictment. He was not a passive benefactor. He used each of them as instruments of factional competition within the system, playing them against reformists, against each other, against the presidency. His assassination in February 2026 removed the one figure who held the network's competing interests in equilibrium. What followed — the January massacre, the succession crisis, the installation of Mojtaba — was the network operating without its arbiter for the first time. The result tells you who was actually running things.">
+  <div class="lbl"><span class="lbl-name kill">Ali Khamenei</span><span class="lbl-sub">Supreme Leader, 1989–2026</span><span class="lbl-kill">Killed 28 Feb 2026</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bg">Patron</span><span class="badge bg">LEC Appointment</span></div>
+      <span class="c-desc">Appointed Ghalibaf as LEC commander in 2000; backed him as Speaker against ultraconservative rivals</span>
+    </div>
+  </div>
+  <div class="cell col-e">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge be">Patron</span><span class="badge be">Judiciary Elevation</span></div>
+      <span class="c-desc">Elevated Eje'i through successive judiciary posts; appointed him Judiciary Chief in 2021</span>
+    </div>
+  </div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bv">Patron</span><span class="badge bv">Political Cover</span></div>
+      <span class="c-desc">Provided political cover after the AMIA indictment; appointed Vahidi Defence Minister and later IRGC commander</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ KEY INTERMEDIARIES ═══════════════════ -->
+<div class="sec">
+  <div class="sec-label"><span class="sec-pip" style="background:#5a5750"></span>Key Intermediaries</div>
+  <div class="sec-col"></div><div class="sec-col"></div><div class="sec-col"></div>
+</div>
+
+<!-- Rezaee -->
+<div class="row sec-int"
+  data-n="Mohsen Rezaee"
+  data-r="IRGC Commander-in-Chief, 1981–1997"
+  data-t="The single most important patron in the network's formation. As IRGC Commander-in-Chief he was Ghalibaf's commanding officer during the war — Ghalibaf led divisions under his authority. Vahidi was his intelligence deputy. Two men, different commands, the same boss, the same war. Neither needed to be introduced to the other later. They already knew. Rezaee also founded Khatam al-Anbia, the IRGC's construction arm, which Ghalibaf later ran. That is how IRGC commanders with no civilian qualifications came to control half the Iranian economy.">
+  <div class="lbl"><span class="lbl-name">Mohsen Rezaee</span><span class="lbl-sub">IRGC Commander, 1981–1997</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bg">Patron</span><span class="badge bg">Commanding Officer</span></div>
+      <span class="c-desc">Commands IRGC divisions under Rezaee throughout the Iran-Iraq war</span>
+    </div>
+  </div>
+  <div class="cell col-e empty"></div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bv">Patron</span><span class="badge bv">Intelligence Deputy</span></div>
+      <span class="c-desc">Serves as Rezaee's direct intelligence deputy at the apex of IRGC command</span>
+    </div>
+  </div>
+</div>
+
+<!-- Quds Force -->
+<div class="row sec-int bg-inst"
+  data-n="Quds Force"
+  data-r="IRGC extraterritorial operations unit, est. 1988"
+  data-t="Vahidi built the Quds Force from nothing, commanded it for nine years and designed it to be resistant to decapitation — compartmentalised, geographically distributed, loyal to the Revolutionary Guard rather than to any individual. When Soleimani was killed in 2020, the network survived intact. That was not an accident. Vahidi built it to survive precisely that kind of disruption. Ghalibaf's connection is documented but informal: Iran International obtained audio of a senior hardliner cleric stating he visited Turkey multiple times specifically to assist the Quds Force and Soleimani. Not a command role. Operational support.">
+  <div class="lbl"><span class="lbl-name">Quds Force</span><span class="lbl-sub">IRGC extraterritorial unit</span><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px;margin-top:4px;display:block;align-self:flex-start">⚑ UK · EU · US FTO · ARG</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge binf">Informal Supporter</span><span class="badge bg">Turkey Operations</span></div>
+      <span class="c-desc">Documented: visited Turkey multiple times to assist Quds Force and Soleimani directly</span>
+    </div>
+  </div>
+  <div class="cell col-e empty"></div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bv">Founder</span><span class="badge bv">Commander, 1988–1997</span></div>
+      <span class="c-desc">Founds and commands IRGC extraterritorial unit; designs it to survive decapitation</span>
+    </div>
+  </div>
+</div>
+
+<!-- Axis of Resistance -->
+<div class="row sec-int bg-inst"
+  data-n="Axis of Resistance"
+  data-r="Iran's regional proxy network — Hezbollah, Hamas, Houthis, Iraqi militias"
+  data-t="Hezbollah, Hamas, the Houthis, the Iraqi Shia militias — Vahidi built the architecture that sustains all of them. Soleimani expanded it and made it famous. Vahidi, now as IRGC commander, sits at the apex of the institution that runs it. Worth noting: the Axis is also the network that provoked the Israeli strikes which killed Khamenei. The thing Vahidi built ultimately consumed his own Supreme Leader. Ghalibaf's Turkey visits to assist Soleimani make him a documented, if informal, facilitator — and as Speaker he has insulated Axis-related expenditure from parliamentary scrutiny.">
+  <div class="lbl"><span class="lbl-name">Axis of Resistance</span><span class="lbl-sub">Iran's regional proxy network</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge binf">Political Facilitator</span><span class="badge bg">Legislative Cover</span></div>
+      <span class="c-desc">Informal facilitator via Quds Force support; as Speaker, insulates Axis funding from scrutiny</span>
+    </div>
+  </div>
+  <div class="cell col-e empty"></div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bv">Architect</span><span class="badge bv">Current Overseer</span></div>
+      <span class="c-desc">Built the foundational proxy architecture; oversees as IRGC commander</span>
+    </div>
+  </div>
+</div>
+
+<!-- Soleimani -->
+<div class="row sec-int"
+  data-n="Qasem Soleimani"
+  data-r="Quds Force Commander, 1998–2020 · Killed Jan 2020"
+  data-t="The Turkey visits transform the Ghalibaf-Soleimani relationship from mere institutional proximity into documented personal collaboration. Ghalibaf went to Turkey — more than once — specifically to assist him. Whether sanctions-busting, logistics, or something else is not specified in the recording. But it is a personal operational relationship, not just two generals who happened to share a corps. Vahidi handed him the Quds Force command in 1997. He then spent two decades turning Vahidi's institutional blueprint into something genuinely formidable. His assassination removed the most capable node the network had.">
+  <div class="lbl"><span class="lbl-name kill">Qasem Soleimani</span><span class="lbl-sub">Quds Force Commander</span><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px;margin-top:4px;display:block;align-self:flex-start">⚑ UK · EU · US</span><span class="lbl-kill">Killed 3 Jan 2020</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bg">IRGC Peer</span><span class="badge binf">Operational Collaborator</span></div>
+      <span class="c-desc">Personally collaborated on Quds Force support operations in Turkey; peer from IRGC seniority</span>
+    </div>
+  </div>
+  <div class="cell col-e empty"></div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bv">Direct Successor</span></div>
+      <span class="c-desc">Took Quds Force command directly from Vahidi in 1997; built on his institutional blueprint</span>
+    </div>
+  </div>
+</div>
+
+<!-- Khatam -->
+<div class="row sec-int bg-inst"
+  data-n="Khatam al-Anbia Construction Headquarters"
+  data-r="IRGC engineering arm, est. 1989 · Also known as GHORB"
+  data-t="Two entities share the Khatam al-Anbia name. The one here is the Construction Headquarters — the IRGC's engineering arm, also known as GHORB. It is separate from the Khatam al-Anbia Central Headquarters, which is Iran's unified military command under the General Staff. The construction body was established by Khamenei's decree in 1989 on Mohsen Rezaei's initiative. It grew into one of Iran's largest contractors across infrastructure, oil and gas, nuclear construction and military engineering. Ghalibaf headed it from 1994 to 1997, which is the mechanism by which IRGC commanders moved from running divisions to running cities and then parliament. The construction headquarters has its own appointed commander; it is IRGC-owned and controlled but run by a named deputy, not the IRGC commander personally.">
+  <div class="lbl"><span class="lbl-name">Khatam al-Anbia</span><span class="lbl-sub">IRGC engineering arm (GHORB)</span><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px;margin-top:4px;display:block;align-self:flex-start">⚑ UK · EU · US · UN</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge bg">Head, 1994–1997</span></div>
+      <span class="c-desc">Runs IRGC's engineering arm during reconstruction; the pivot from military command to civilian and political power</span>
+    </div>
+  </div>
+  <div class="cell col-e empty"></div>
+  <div class="cell col-v empty"></div>
+</div>
+
+<!-- Taeb -->
+<div class="band sec-int"
+  data-n="Hossein Taeb"
+  data-r="IRGC Intelligence Organisation chief · Habib's Circle"
+  data-t="Taeb is a member of Habib's Circle — a wartime cohort from the 27th Mohammad Rasulullah Division whose members spent the decades after the Iran-Iraq war occupying key intelligence posts across the apparatus. He is named alongside Ghalibaf and Vahidi as one of the three principal campaigners for installing Mojtaba Khamenei. That is not a constitutional process. It is a cartel putting its man in place. Taeb is the most explicit evidence that the push is coming from inside IRGC intelligence.">
+  <div class="band-lbl"><span class="band-name">Hossein Taeb</span><span class="band-sub">IRGC Intel chief · Habib's Circle</span><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px;margin-top:4px;display:block;align-self:flex-start">⚑ EU · US</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge bg">Habib's Circle</span><span class="badge bg">Succession Co-Campaigner</span></div>
+    IRGC roots and wartime network; named co-campaigner for Mojtaba's succession
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">IRGC Intel Axis</span><span class="badge be">Succession Co-Campaigner</span></div>
+    IRGC intelligence axis; named co-campaigner for Mojtaba's succession
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge bv">Habib's Circle</span><span class="badge bv">Succession Co-Campaigner</span></div>
+    IRGC roots and Quds Force network; named co-campaigner for Mojtaba's succession
+  </div>
+</div>
+
+<!-- Larijani — plain background (individual, not institution) -->
+<div class="band sec-int"
+  data-n="Ali Larijani"
+  data-r="Parliament Speaker; SNSC Secretary · Killed 17 Mar 2026"
+  data-t="Western governments spent years treating Larijani as someone you could do business with. A pragmatic conservative, they called him. He practically invented the genre of televised forced confessions — he ran state broadcasting in the 1990s. His function in the network was translation. He converted positions that, coming directly from Ghalibaf or Vahidi, would have been unacceptable, into language that European foreign ministers could pretend was a basis for negotiation. That service is now gone. The three remaining principals have no one left who can do that for them.">
+  <div class="band-lbl"><span class="band-name" style="color:#8b1a1a">Ali Larijani</span><span class="band-sub">Speaker; SNSC Secretary</span><span class="band-kill">Killed 17 Mar 2026</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge bg">SNSC Co-Member</span><span class="badge bg">Factional Ally</span></div>
+    SNSC co-member; factional ally in parliament; succession coordinator before his death
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">SNSC Co-Member</span><span class="badge be">Expediency Peer</span></div>
+    SNSC and Expediency Council peer; the regime's principal diplomatic translator
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge bneu">Indirect — SNSC Only</span></div>
+    SNSC overlap only; no direct operational link
+  </div>
+</div>
+
+<!-- Radan — plain background (individual) -->
+<div class="band sec-int"
+  data-n="Ahmad-Reza Radan"
+  data-r="Law Enforcement Command chief · 2023–present · Sanctioned EU + US"
+  data-t="Radan rose through the IRGC before being transferred to the police — the same route Ghalibaf took after 1999, when Khamenei put him in charge of the Law Enforcement Command. Ghalibaf preceded Radan in that post. Radan was his deputy during 2009, doing the operational work on the ground while Ghalibaf coordinated above. Now Radan runs the LEC and reports directly to Vahidi as Interior Minister. A chain that runs: Ghalibaf built it, Radan runs it, Vahidi owns it.">
+  <div class="band-lbl"><span class="band-name">Ahmad-Reza Radan</span><span class="band-sub">LEC chief</span><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px;margin-top:4px;display:block;align-self:flex-start">⚑ EU · US</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge bg">LEC Predecessor</span><span class="badge bg">2009 Superior</span></div>
+    Preceded Radan as LEC commander; Radan served as his operational deputy in 2009
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">2009 Co-Enforcer</span><span class="badge be">IRGC Ecosystem Peer</span></div>
+    Operational co-enforcer in 2009 as deputy police chief; IRGC security ecosystem peer
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge bv">Direct Subordinate</span><span class="badge bv">Interior Ministry</span></div>
+    LEC reports directly to Interior Minister — Radan is Vahidi's enforcement instrument
+  </div>
+</div>
+
+<!-- ═══════════════════ REPRESSION EVENTS ═══════════════════ -->
+<div class="sec">
+  <div class="sec-label"><span class="sec-pip" style="background:#8b1a1a"></span>Repression Events</div>
+  <div class="sec-col"></div><div class="sec-col"></div><div class="sec-col"></div>
+</div>
+
+<!-- 1988 -->
+<div class="row sec-rep bg-rep"
+  data-n="1988 massacres"
+  data-r="5,000+ political prisoners executed"
+  data-t="This is the event both men have spent decades not discussing. Eje'i was the Judiciary's formal Representative to MOIS — his institutional role placed him inside the chain of command as thousands of political prisoners were executed over a matter of weeks following Khomeini's fatwa. Vahidi was IRGC Intelligence chief. They were both there. The security doctrine used in 1988 — mass detention, summary trial, rapid execution, deniable bureaucracy — has since been refined and reapplied at each subsequent crackdown. The architecture is the same. Only the numbers change.">
+  <div class="lbl"><span class="lbl-name rep">1988 massacres</span><span class="lbl-sub">5,000+ prisoners executed</span></div>
+  <div class="cell col-g empty"></div>
+  <div class="cell col-e">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Judiciary's Representative</span><span class="badge brep">MOIS Liaison</span></div>
+      <span class="c-desc">In the operational chain of command during the mass execution of political prisoners</span>
+    </div>
+  </div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">IRGC Intelligence Chief</span></div>
+      <span class="c-desc">In the operational chain of command during the mass execution of political prisoners</span>
+    </div>
+  </div>
+</div>
+
+<!-- 1999 -->
+<div class="row sec-rep bg-rep"
+  data-n="1999 student uprising"
+  data-r="Dormitory raids; student deaths"
+  data-t="Ghalibaf co-signed the IRGC letter threatening Khatami with military intervention if the protests continued. He then led the crackdown. A decade later, running for president, he boasted about it. That calculation — that domestic hardline audiences would read a role in political violence as a credential rather than a disqualification — tells you a great deal about the political culture he was operating in. And winning in.">
+  <div class="lbl"><span class="lbl-name rep">1999 student uprising</span><span class="lbl-sub">Dormitory raids; student deaths</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">LEC Commander</span><span class="badge brep">Crackdown Lead</span></div>
+      <span class="c-desc">Co-signs IRGC threat letter to Khatami; leads crackdown; later uses it as a campaign credential</span>
+    </div>
+  </div>
+  <div class="cell col-e empty"></div>
+  <div class="cell col-v empty"></div>
+</div>
+
+<!-- 2009 -->
+<div class="row sec-rep bg-rep"
+  data-n="2009 Green Movement"
+  data-r="Post-election protests; hundreds killed · All three sanctioned EU + US"
+  data-t="The first time all three principals operated simultaneously in the same repression. Ghalibaf coordinated street-level suppression from the Tehran Mayor's office. Eje'i ran the detention apparatus — making sure protesters went into the judicial pipeline and did not come back out. Vahidi entered the cabinet as Defence Minister mid-crackdown: the military-institutional weight, the guarantee that the security establishment was fully committed. The EU and US sanctioned all three. None have ever expressed regret.">
+  <div class="lbl"><span class="lbl-name rep">2009 Green Movement</span><span class="lbl-sub">First convergence of all three</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Street Coordinator</span><span class="badge bsanc">⚑ EU · US</span></div>
+      <span class="c-desc">Coordinates street-level suppression as Tehran Mayor; Radan is operational deputy</span>
+    </div>
+  </div>
+  <div class="cell col-e">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Intelligence Minister</span><span class="badge brep">Detention Pipeline</span><span class="badge bsanc">⚑ UK · EU · US</span></div>
+      <span class="c-desc">Runs the detention apparatus; arrests become cases, not releases</span>
+    </div>
+  </div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Defence Minister</span><span class="badge brep">Military Backing</span><span class="badge bsanc">⚑ EU · US</span></div>
+      <span class="c-desc">Enters as Defence Minister mid-crackdown; the security establishment's guarantee</span>
+    </div>
+  </div>
+</div>
+
+<!-- 2022 -->
+<div class="row sec-rep bg-rep"
+  data-n="2022 Mahsa (Jina) Amini uprising"
+  data-r='"Woman, Life, Freedom" · 500+ killed'
+  data-t="The clearest demonstration of what full network coordination produces. Ghalibaf's role was architectural — he used parliamentary procedure to make the crackdown unchallengeable before it began. Eje'i sent 'no leniency' directives to prosecutors nationwide: charge everyone, accept no bail, push for custody, and do it fast. Once the pipeline is full and moving, the protest movement cannot adapt. Vahidi held the Law Enforcement Command chain intact as Interior Minister. Three pillars, one operation. First time it had worked quite so cleanly.">
+  <div class="lbl"><span class="lbl-name rep">2022 Mahsa (Jina) Amini uprising</span><span class="lbl-sub">"Woman, Life, Freedom" · 500+ killed</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Legislative Cover</span><span class="badge brep">Parliamentary Shield</span></div>
+      <span class="c-desc">Uses parliamentary procedure to insulate the crackdown from any institutional challenge</span>
+    </div>
+  </div>
+  <div class="cell col-e">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Judiciary Chief</span><span class="badge brep">"No Leniency" Directive</span></div>
+      <span class="c-desc">Mass arrests converted into prosecutable cases nationwide; speed is the doctrine</span>
+    </div>
+  </div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Interior Minister</span><span class="badge brep">LEC Command</span></div>
+      <span class="c-desc">Holds LEC chain intact; street forces report to same axis as parliament and judiciary</span>
+    </div>
+  </div>
+</div>
+
+<!-- 2026 massacre -->
+<div class="row sec-rep bg-rep"
+  data-n="January 2026 massacre"
+  data-r="Over 30,000 killed in opening crackdown"
+  data-t="'If we want to do something, we have to do it fast — delay makes it meaningless.' Eje'i said this publicly, to judges. It is not a slip. It is a statement of doctrine. Ghalibaf provided the parliamentary framing. Larijani was already dead when the massacre began, so the diplomatic translation function that had previously given the regime some external cover was gone. Vahidi held the IRGC command chain throughout. Over 30,000 people killed in the opening weeks. The explicit public coordination between all three is the clearest available evidence that these are not colleagues. They are a cartel. And they are running the state.">
+  <div class="lbl"><span class="lbl-name rep">January 2026 massacre</span><span class="lbl-sub">Over 30,000 killed</span></div>
+  <div class="cell col-g">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Parliamentary Cover</span><span class="badge brep">Political Framing</span></div>
+      <span class="c-desc">Provides parliamentary cover; no institutional challenge permitted to proceed</span>
+    </div>
+  </div>
+  <div class="cell col-e">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">Judiciary Chief</span><span class="badge brep">Speed Directive</span></div>
+      <span class="c-desc">"If we want to do something, we have to do it fast — delay makes it meaningless"</span>
+    </div>
+  </div>
+  <div class="cell col-v">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge brep">IRGC Commander</span><span class="badge brep">LEC Oversight</span></div>
+      <span class="c-desc">Holds IRGC command chain intact — over 30,000 killed in the opening weeks</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SHARED INSTITUTIONS ═══════════════════ -->
+<div class="sec">
+  <div class="sec-label"><span class="sec-pip" style="background:#1e4f8a"></span>Shared Institutions</div>
+  <div class="sec-col"></div><div class="sec-col"></div><div class="sec-col"></div>
+</div>
+
+<!-- Ahmadinejad Cabinet -->
+<div class="band sec-inst bg-inst"
+  data-n="Ahmadinejad Cabinet"
+  data-r="Institutional overlap, 2005–2013"
+  data-t="The first cabinet where Eje'i and Vahidi served simultaneously. Eje'i was Intelligence Minister until he was pushed out in the Mashaei row — a factional dispute that illustrated how quickly internal coalitions fracture under presidential pressure. Vahidi came in as Defence Minister almost in the same moment Eje'i was going. Ghalibaf was Tehran Mayor throughout — not in the cabinet, but accumulating what the cabinet couldn't give him: a public profile and a patronage network built on the city rather than on the security apparatus.">
+  <div class="band-lbl"><span class="band-name">Ahmadinejad Cabinet</span><span class="band-sub">Institution, 2005–2013</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge bg">Tehran Mayor</span></div>
+    Builds urban patronage network and public profile outside the cabinet
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">Intelligence Minister</span></div>
+    Intelligence Minister 2005–09; dismissed in the Mashaei factional dispute
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge bv">Defence Minister</span></div>
+    Enters as Defence Minister just as Eje'i departs; brief but documented overlap
+  </div>
+</div>
+
+<!-- Expediency Council -->
+<div class="band sec-inst bg-inst"
+  data-n="Expediency Discernment Council"
+  data-r="All three appointed concurrently"
+  data-t="The body that adjudicates disputes between parliament and the Guardian Council and advises the Supreme Leader. All three served concurrently. This is less about what they did there than what it signals: concurrent appointment to the Expediency Council means Khamenei trusted all three at the highest level simultaneously. You do not need to conspire with people you already sit next to on every consequential committee.">
+  <div class="band-lbl"><span class="band-name">Expediency Discernment Council</span><span class="band-sub">All three concurrent</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge bg">Concurrent Member</span></div>
+    Concurrent appointment — signals factional trust at the highest level
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">Concurrent Member</span></div>
+    Concurrent appointment — signals factional trust at the highest level
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge bv">Concurrent Member</span></div>
+    Concurrent appointment — signals factional trust at the highest level
+  </div>
+</div>
+
+<!-- SNSC -->
+<div class="band sec-inst bg-inst"
+  data-n="Supreme National Security Council (SNSC)"
+  data-r="Simultaneous membership, 2021–2026"
+  data-t="The single most consequential institutional overlap in the network. All three sat simultaneously — Ghalibaf as Speaker, Eje'i as Judiciary Chief, Vahidi as Interior Minister — on the body that authorises coercive operations. Every major security decision from 2021 to 2026 was made in a room where all three were present and voting. The January 2026 crackdown didn't require coordination between them because they had been in the same room authorising the same operations for five years. It was the natural output of a process already long underway.">
+  <div class="band-lbl"><span class="band-name">Supreme National Security Council</span><span class="band-sub">Simultaneous, 2021–2026</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge bg">Parliament Speaker</span></div>
+    Legislative axis; present and voting on every security decision for five years
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">Judiciary Chief</span></div>
+    Judicial axis; converts security decisions into legal process
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge bv">Interior Minister</span></div>
+    Security axis; controls Law Enforcement Command directly
+  </div>
+</div>
+
+<!-- Raisi Government -->
+<div class="band sec-inst bg-inst"
+  data-n="Raisi Government"
+  data-r="All three axes of the coercive state, 2021–2024"
+  data-t="This was not a cabinet. It was a command structure. For the first time in the Islamic Republic's history, all three axes of the coercive state — legislative, judicial and security — were controlled simultaneously by figures from the same IRGC-rooted network. They did not need to coordinate. They did not need to agree. They had spent decades building the same set of reflexes. The Raisi government was the moment those reflexes became policy.">
+  <div class="band-lbl"><span class="band-name">Raisi Government</span><span class="band-sub">Institution, 2021–2024</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge bg">Parliament Speaker</span></div>
+    Legislative cover and signal transmission across all domains
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">Judiciary Chief</span></div>
+    Coercion becomes procedure at this junction
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge bv">Interior Minister</span></div>
+    Coercive chain intact; the security apparatus held together
+  </div>
+</div>
+
+<!-- ═══════════════════ SUCCESSION ═══════════════════ -->
+<div class="sec">
+  <div class="sec-label"><span class="sec-pip" style="background:#3a2870"></span>Succession</div>
+  <div class="sec-col"></div><div class="sec-col"></div><div class="sec-col"></div>
+</div>
+
+<!-- ILC solo row -->
+<div class="row sec-succ bg-succ"
+  data-n="Interim Leadership Council"
+  data-r="Formal sovereign authority · Eje'i appointed, March 2026"
+  data-t="After Khamenei's assassination, Eje'i was placed on the three-member Interim Leadership Council — giving him formal constitutional authority at the apex of the state. Ghalibaf and Vahidi were not on it. They did not need to be. Ghalibaf was Speaker of the parliament that would ratify whatever the Council decided. Vahidi commanded the IRGC — the organisation the Council had no authority to override. The Council is constitutionally legitimate. It is also hostage to the two men who are not on it.">
+  <div class="lbl"><span class="lbl-name">Interim Leadership Council</span><span class="lbl-sub">March 2026</span></div>
+  <div class="cell col-g empty"></div>
+  <div class="cell col-e">
+    <div class="cell-inner">
+      <div class="badges"><span class="badge be">Council Member</span><span class="badge be">Sovereign Authority</span></div>
+      <span class="c-desc">Holds formal sovereign authority during the transition; constitutional face of an IRGC operation</span>
+    </div>
+  </div>
+  <div class="cell col-v empty"></div>
+</div>
+
+<!-- Mojtaba succession -->
+<div class="band sec-succ bg-succ"
+  data-n="Mojtaba Khamenei succession bloc"
+  data-r="Installed as Supreme Leader, March 2026"
+  data-t="The endpoint. Every node in this network points toward it. Ghalibaf, Vahidi and Taeb were the principal campaigners — not because Mojtaba is a visionary or a strongman, but because he is controllable. They did not want a successor. They wanted a placeholder — someone through whom IRGC factional interests could be institutionalised at the level of supreme authority without any of the three principals having to expose themselves by claiming the position directly. Eje'i provided the constitutional cover on the Interim Leadership Council. The succession is not dynastic. It is a cartel putting a figurehead in place while the real power sits one step removed.">
+  <div class="band-lbl"><span class="band-name">Mojtaba Khamenei bloc</span><span class="band-sub">Installed Supreme Leader, Mar 2026</span></div>
+  <div class="band-cell col-g">
+    <div class="badges"><span class="badge binf">Principal Campaigner</span><span class="badge bg">Parliament Ratification</span></div>
+    Runs the parliamentary ratification process from the Speaker's chair
+  </div>
+  <div class="band-cell col-e">
+    <div class="badges"><span class="badge be">Interim Council</span><span class="badge be">Constitutional Cover</span></div>
+    Formal sovereign authority on Interim Leadership Council; the operation's constitutional face
+  </div>
+  <div class="band-cell col-v">
+    <div class="badges"><span class="badge binf">Principal Campaigner</span><span class="badge bv">IRGC Leverage</span></div>
+    IRGC command leverage means no rival bloc can contest the installation
+  </div>
+</div>
+
+</div><!-- /grid -->
+</div><!-- /page -->
+
+<div id="tip"></div>
+<script>
+(function() {
+  var tip = document.getElementById('tip');
+  function mv(e) {
+    var x = e.clientX + 14, y = e.clientY + 14;
+    var pw = 320, ph = tip.offsetHeight || 160;
+    if (x + pw > window.innerWidth  - 8) x = e.clientX - pw - 14;
+    if (y + ph > window.innerHeight - 8) y = e.clientY - ph - 14;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  function show(el, e) {
+    var n = el.getAttribute('data-n') || el.closest('[data-n]') && el.closest('[data-n]').getAttribute('data-n');
+    var r = el.getAttribute('data-r') || el.closest('[data-r]') && el.closest('[data-r]').getAttribute('data-r');
+    var t = el.getAttribute('data-t') || el.closest('[data-t]') && el.closest('[data-t]').getAttribute('data-t');
+    if (!t) return;
+    tip.innerHTML = (n ? '<strong>' + n + '</strong>' : '') + (r ? '<em>' + r + '</em>' : '') + t;
+    tip.style.display = 'block'; mv(e);
+  }
+  // rows — hover on any part of the row shows the tip
+  document.querySelectorAll('.row[data-t]').forEach(function(el) {
+    el.addEventListener('mouseenter', function(e) { show(el, e); });
+    el.addEventListener('mousemove', mv);
+    el.addEventListener('mouseleave', function() { tip.style.display = 'none'; });
+  });
+  // bands
+  document.querySelectorAll('.band[data-t]').forEach(function(el) {
+    el.addEventListener('mouseenter', function(e) { el.classList.add('active'); show(el, e); });
+    el.addEventListener('mousemove', mv);
+    el.addEventListener('mouseleave', function() { el.classList.remove('active'); tip.style.display = 'none'; });
+  });
+})();
+</script>
+</body>
+</html>
