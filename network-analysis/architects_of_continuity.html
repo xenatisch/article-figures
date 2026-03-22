@@ -304,10 +304,9 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 #tip em { font-style: normal; font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #888; display: block; margin-bottom: 8px; letter-spacing: .05em; }
 
 /* ── MOBILE TAB SWITCHER ── */
-/* Tab bar lives inside .grid, sticks to page top when scrolled there */
+/* Tab bar — fixed on mobile so it sticks throughout entire scroll */
 .tab-bar {
   display: none;
-  position: sticky; top: 0; z-index: 25;
   background: #f7f4ee;
   border-bottom: 2px solid #c0bbb2;
   border-top: 1px solid #c0bbb2;
@@ -369,7 +368,17 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   .page { padding: 0 12px 48px; }
   h1 { font-size: 20px; }
   .deck { font-size: 12px; }
-  .tab-bar { display: flex; }
+  .tab-bar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-top: 2.5px solid #1a1814;
+    background: #f7f4ee;
+    margin: 0 -12px; /* counteract .page padding on mobile */
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 
   /* col-heads: hide the desktop sticky header on mobile */
   .col-heads { display: none; }
@@ -470,14 +479,13 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 
 <div class="hint"><div class="hint-icon">⌖</div><span>Hover or tap any row for analysis</span></div>
 
-<div class="grid">
-
-<!-- tab bar — mobile only, lives inside grid so it scrolls with content then sticks -->
 <div class="tab-bar">
   <button data-tab="G" class="active">Ghalibaf</button>
   <button data-tab="E">Eje'i</button>
   <button data-tab="V">Vahidi</button>
 </div>
+
+<div class="grid">
 
 <!-- column headers -->
 <div class="col-heads">

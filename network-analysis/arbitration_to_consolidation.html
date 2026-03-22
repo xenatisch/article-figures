@@ -4,6 +4,7 @@ Copyright (c) 2026 Pouria Hadjibagheri. All rights reserved.
 
 Interactive timeline figure showing the 2009–2026 consolidation of Iranian regime power and key elimination/repression/war events.
 -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -570,15 +571,7 @@ function draw() {
     lx += ctx.measureText(it.label).width + (mobile?16:30);
   });
 
-  // Mobile: "tap dots" hint — positioned safely between lane bottom and dot row
-  if (mobile && EVT_DOT_Y - LANE_BOTTOM > 20) {
-    ctx.save();
-    ctx.font="300 7px 'IBM Plex Mono',monospace";
-    ctx.fillStyle='rgba(154,151,149,0.65)';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('HOVER OR TAP ANY DOT FOR ANALYSIS', W/2, LANE_BOTTOM + Math.round((EVT_DOT_Y - LANE_BOTTOM)/2));
-    ctx.restore();
-  }
+  // Mobile tap hint now shown only in HTML below canvas, not on canvas
 }
 
 // ── Interaction ───────────────────────────────────────────────
