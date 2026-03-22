@@ -298,10 +298,168 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 .band.sec-orig .band-cell.col-e::before { background: #1e4f8a; box-shadow: 0 0 0 2.5px #eef3f8; }
 .band.sec-orig .band-cell.col-v::before { background: #1a4a2e; box-shadow: 0 0 0 2.5px #eef3f8; }
 
-/* tooltip */
-#tip { position: fixed; z-index: 9999; width: 320px; background: #1a1814; color: #f0ece3; border-radius: 3px; padding: 13px 15px; font-size: 11.5px; line-height: 1.68; font-weight: 300; pointer-events: none; box-shadow: 0 6px 28px rgba(0,0,0,.55); display: none; font-family: 'Source Sans 3', sans-serif; }
-#tip strong { font-weight: 600; font-size: 13px; display: block; margin-bottom: 5px; color: #fff; }
-#tip em { font-style: normal; font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #888; display: block; margin-bottom: 8px; letter-spacing: .05em; }
+/* ── RESPONSIVE ── */
+@media (max-width: 680px) {
+  .page { padding: 0 14px 48px; }
+  h1 { font-size: 22px; }
+  .deck { font-size: 12.5px; }
+
+  /* hide sticky col-heads on mobile — each cell gets its own principal label */
+  .col-heads { display: none; }
+
+  /* section headers: full width, no grid */
+  .sec { display: block; }
+  .sec-col { display: none; }
+
+  /* rows and bands: stack vertically */
+  .row, .band {
+    display: block;
+    border-bottom: 2px solid #ece8e0;
+  }
+
+  /* label cell: full width header for each row */
+  .lbl, .band-lbl {
+    width: 100%; min-width: 0; max-width: 100%;
+    padding: 10px 12px 8px;
+    background: #f0ece4;
+    border-bottom: 1px solid #dedad4;
+  }
+
+  /* principal cells: full width, with a coloured top-label */
+  .cell, .band-cell {
+    display: block;
+    width: 100%;
+    border-left: none !important;
+    border-top: 3px solid transparent;
+    padding: 0;
+  }
+  .cell.empty { display: none; }
+
+  .cell-inner { padding: 9px 12px 10px 12px; min-height: 0; }
+  .cell-inner::before { display: none !important; }
+
+  /* coloured top border per principal on mobile */
+  .row.sec-orig .cell.col-g, .row.sec-int .cell.col-g,
+  .row.sec-inst .cell.col-g, .row.sec-succ .cell.col-g,
+  .row.sec-rep  .cell.col-g { border-top-color: #b06000; }
+  .row.sec-orig .cell.col-e, .row.sec-int .cell.col-e,
+  .row.sec-inst .cell.col-e, .row.sec-succ .cell.col-e,
+  .row.sec-rep  .cell.col-e { border-top-color: #1e4f8a; }
+  .row.sec-orig .cell.col-v, .row.sec-int .cell.col-v,
+  .row.sec-inst .cell.col-v, .row.sec-succ .cell.col-v,
+  .row.sec-rep  .cell.col-v { border-top-color: #1a4a2e; }
+
+  .band-cell { border-left: none !important; padding: 9px 12px 10px; }
+  .band-cell::before { display: none !important; }
+  .band.sec-int  .band-cell.col-g,
+  .band.sec-inst .band-cell.col-g,
+  .band.sec-succ .band-cell.col-g,
+  .band.sec-orig .band-cell.col-g { border-top: 3px solid #b06000 !important; }
+  .band.sec-int  .band-cell.col-e,
+  .band.sec-inst .band-cell.col-e,
+  .band.sec-succ .band-cell.col-e,
+  .band.sec-orig .band-cell.col-e { border-top: 3px solid #1e4f8a !important; }
+  .band.sec-int  .band-cell.col-v,
+  .band.sec-inst .band-cell.col-v,
+  .band.sec-succ .band-cell.col-v,
+  .band.sec-orig .band-cell.col-v { border-top: 3px solid #1a4a2e !important; }
+
+  /* principal name chip above each cell on mobile */
+  .cell[class*="col-"]::before,
+  .band-cell[class*="col-"]::before { display: none !important; }
+  .cell .cell-inner::after,
+  .band-cell::after { display: none; }
+
+  /* principal label chips injected via CSS */
+  .cell.col-g .cell-inner::before,
+  .band-cell.col-g::before {
+    content: 'Ghalibaf';
+    display: block !important;
+    position: static !important;
+    width: auto !important; height: auto !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.5px; font-weight: 500;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: #b06000; margin-bottom: 6px;
+  }
+  .cell.col-e .cell-inner::before,
+  .band-cell.col-e::before {
+    content: "Mohseni-Eje\2019i";
+    display: block !important;
+    position: static !important;
+    width: auto !important; height: auto !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.5px; font-weight: 500;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: #1e4f8a; margin-bottom: 6px;
+  }
+  .cell.col-v .cell-inner::before,
+  .band-cell.col-v::before {
+    content: 'Vahidi';
+    display: block !important;
+    position: static !important;
+    width: auto !important; height: auto !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.5px; font-weight: 500;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: #1a4a2e; margin-bottom: 6px;
+  }
+
+  /* sticky col-heads replaced by section headers being more prominent */
+  .sec-label { font-size: 13px; padding: 9px 12px; }
+}
+
+@media (min-width: 681px) and (max-width: 860px) {
+  .page { padding: 0 16px 56px; }
+  h1 { font-size: 26px; }
+  .row, .band, .col-heads, .sec {
+    grid-template-columns: 140px 1fr 1fr 1fr;
+  }
+  .lbl, .band-lbl { width: 140px; min-width: 140px; max-width: 140px; }
+  .ch-name { font-size: 11px; }
+  .ch-role { font-size: 9px; }
+}
+
+/* ── MOBILE DRAWER (replaces hover tooltip) ── */
+#drawer-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.35);
+  z-index: 998;
+}
+#drawer {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #1a1814;
+  color: #f0ece3;
+  padding: 18px 20px 32px;
+  font-size: 12px; line-height: 1.68; font-weight: 300;
+  font-family: 'Source Sans 3', sans-serif;
+  border-top: 3px solid #8b1a1a;
+  z-index: 999;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+#drawer strong { font-weight: 600; font-size: 14px; display: block; margin-bottom: 5px; color: #fff; }
+#drawer em { font-style: normal; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #888; display: block; margin-bottom: 10px; letter-spacing: .05em; }
+#drawer-close {
+  position: sticky; top: 0; float: right;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  color: #666; cursor: pointer; letter-spacing: .05em;
+  background: #1a1814; padding: 2px 0 4px 8px;
+}
+#drawer-close:hover { color: #aaa; }
+.hint { cursor: default; }
 </style>
 </head>
 <body>
@@ -841,9 +999,23 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 </div><!-- /page -->
 
 <div id="tip"></div>
+<div id="drawer-overlay"></div>
+<div id="drawer"></div>
 <script>
 (function() {
   var tip = document.getElementById('tip');
+  var drawer = document.getElementById('drawer');
+  var overlay = document.getElementById('drawer-overlay');
+  var isMobile = function() { return window.innerWidth <= 680; };
+
+  function buildHTML(el) {
+    var n = el.getAttribute('data-n');
+    var r = el.getAttribute('data-r');
+    var t = el.getAttribute('data-t');
+    if (!t) return null;
+    return (n ? '<strong>' + n + '</strong>' : '') + (r ? '<em>' + r + '</em>' : '') + t;
+  }
+
   function mv(e) {
     var x = e.clientX + 14, y = e.clientY + 14;
     var pw = 320, ph = tip.offsetHeight || 160;
@@ -851,26 +1023,62 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
     if (y + ph > window.innerHeight - 8) y = e.clientY - ph - 14;
     tip.style.left = x + 'px'; tip.style.top = y + 'px';
   }
-  function show(el, e) {
-    var n = el.getAttribute('data-n') || el.closest('[data-n]') && el.closest('[data-n]').getAttribute('data-n');
-    var r = el.getAttribute('data-r') || el.closest('[data-r]') && el.closest('[data-r]').getAttribute('data-r');
-    var t = el.getAttribute('data-t') || el.closest('[data-t]') && el.closest('[data-t]').getAttribute('data-t');
-    if (!t) return;
-    tip.innerHTML = (n ? '<strong>' + n + '</strong>' : '') + (r ? '<em>' + r + '</em>' : '') + t;
-    tip.style.display = 'block'; mv(e);
+
+  function showDrawer(el) {
+    var html = buildHTML(el);
+    if (!html) return;
+    var accentCol = el.classList.contains('col-g') ? '#b06000' :
+                    el.classList.contains('col-e') ? '#1e4f8a' :
+                    el.classList.contains('col-v') ? '#1a4a2e' : '#8b1a1a';
+    drawer.style.borderTopColor = accentCol;
+    drawer.innerHTML = '<span id="drawer-close">ESC ✕</span>' + html;
+    drawer.style.display = 'block';
+    overlay.style.display = 'block';
+    document.getElementById('drawer-close').addEventListener('click', closeDrawer);
   }
-  // rows — hover on any part of the row shows the tip
-  document.querySelectorAll('.row[data-t]').forEach(function(el) {
-    el.addEventListener('mouseenter', function(e) { show(el, e); });
-    el.addEventListener('mousemove', mv);
-    el.addEventListener('mouseleave', function() { tip.style.display = 'none'; });
-  });
-  // bands
-  document.querySelectorAll('.band[data-t]').forEach(function(el) {
-    el.addEventListener('mouseenter', function(e) { el.classList.add('active'); show(el, e); });
-    el.addEventListener('mousemove', mv);
-    el.addEventListener('mouseleave', function() { el.classList.remove('active'); tip.style.display = 'none'; });
-  });
+
+  function closeDrawer() {
+    drawer.style.display = 'none';
+    overlay.style.display = 'none';
+  }
+
+  overlay.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDrawer(); });
+
+  function attachEl(el) {
+    // Desktop: hover tooltip
+    el.addEventListener('mouseenter', function(e) {
+      if (isMobile()) return;
+      var html = buildHTML(el);
+      if (!html) return;
+      el.classList.add('active');
+      tip.innerHTML = html;
+      tip.style.display = 'block';
+      mv(e);
+    });
+    el.addEventListener('mousemove', function(e) {
+      if (!isMobile()) mv(e);
+    });
+    el.addEventListener('mouseleave', function() {
+      if (isMobile()) return;
+      el.classList.remove('active');
+      tip.style.display = 'none';
+    });
+    // Mobile: tap drawer
+    el.addEventListener('click', function(e) {
+      if (!isMobile()) return;
+      e.stopPropagation();
+      showDrawer(el);
+    });
+    // Touch devices with larger screens (tablets)
+    el.addEventListener('touchend', function(e) {
+      if (window.innerWidth > 680) return;
+      e.preventDefault();
+      showDrawer(el);
+    });
+  }
+
+  document.querySelectorAll('.row[data-t], .band[data-t]').forEach(attachEl);
 })();
 </script>
 </body>

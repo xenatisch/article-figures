@@ -4,6 +4,7 @@ Copyright (c) 2026 Pouria Hadjibagheri. All rights reserved.
 
 Interactive timeline figure showing the 2009–2026 consolidation of Iranian regime power and key elimination/repression/war events.
 -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -58,7 +59,7 @@ canvas{display:block;width:100%;cursor:default}
     <div id="detail-body"></div>
   </div>
   <canvas id="c"></canvas>
-  <p class="hover-hint">↑ Hover any marker for analysis</p>
+  <p class="hover-hint">↑ Hover or tap any marker for analysis</p>
 </div>
 </div>
 <div id="tip"></div>
@@ -67,11 +68,6 @@ canvas{display:block;width:100%;cursor:default}
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 const DPR = window.devicePixelRatio || 1;
-const W = 752, H = 560;
-canvas.width  = W * DPR;
-canvas.height = H * DPR;
-canvas.style.height = H + 'px';
-ctx.scale(DPR, DPR);
 
 const BG = '#f7f4ee', INK = '#1a1814', MUTED = '#9e9b95', RULE = '#c0bbb2';
 const CG = '#b06000', CE = '#1e4f8a', CV = '#1a4a2e';
@@ -82,28 +78,9 @@ const TYPE_COL = {
   war:        '#2a5070',
 };
 
-// ── Split axis ────────────────────────────────────────────────
-const TL_LEFT = 92, TL_RIGHT = W - 30, TL_W = TL_RIGHT - TL_LEFT;
-const SEG = [
-  { from:2009, to:2014,   frac:0.30, x0:0    },
-  { from:2014, to:2019,   frac:0.08, x0:0.30 },
-  { from:2019, to:2026.6, frac:0.62, x0:0.38 },
-];
-function xOf(year) {
-  for (let i = 0; i < SEG.length; i++) {
-    const s = SEG[i];
-    if (year <= s.to || i === SEG.length-1) {
-      const t = Math.max(0, Math.min(1, (year - s.from) / (s.to - s.from)));
-      return TL_LEFT + (s.x0 + t * s.frac) * TL_W;
-    }
-  }
-  return TL_RIGHT;
-}
-
-const AXIS_Y = 78;
-
-// ── Principal role lanes ──────────────────────────────────────
-const LANE_TOP = 116, ROW_H = 20, ROW_GAP = 3, LANE_PAD = 14;
+// ── Principal role data (year-based, position-independent) ────
+const LANE_TOP_FRAC = 0.139; // fraction of H
+const ROW_H = 20, ROW_GAP = 3, LANE_PAD = 14;
 const PRINCIPALS = [
   { id:'G', label:'Ghalibaf', col:CG, roles:[
     { from:2009,   to:2017,   label:'Tehran Mayor',          row:0, solid:true  },
@@ -127,143 +104,157 @@ const PRINCIPALS = [
     { from:2024,   to:2026.6, label:'IRGC Commander',        row:2, solid:true  },
   ]},
 ];
-let yRunner = LANE_TOP;
-PRINCIPALS.forEach(p => {
-  const maxRow = Math.max(...p.roles.map(r => r.row));
-  p.yTop = yRunner;
-  p.yBot = yRunner + (maxRow+1)*(ROW_H+ROW_GAP) - ROW_GAP;
-  p.yCen = (p.yTop + p.yBot) / 2;
-  yRunner = p.yBot + LANE_PAD;
-});
-const LANE_BOTTOM = yRunner + 6;
 
-// ── Events ────────────────────────────────────────────────────
-// War events: drawn at top, each with explicit pixel labelX
-// Standard events: drawn below lanes, labels auto-placed
-// Each event also carries an explicit dotX/dotY if in dense cluster
-
-const EVT_DOT_Y = LANE_BOTTOM + 28; // baseline dot row
-
-// All events. Dense 2026 cluster gets explicit dotY offsets (staggered).
-// labelX/labelY are computed below — NOT stored here.
 const EVENTS = [
   { year:2009.5,  type:'repression',
     title:'2009 Green Movement',
     sub:'First convergence · all three sanctioned EU + US',
     body:"First simultaneous convergence of all three. Ghalibaf coordinates street suppression, Eje'i runs the detention pipeline, Vahidi enters as Defence Minister mid-crackdown. All three subsequently sanctioned by EU and US." },
-
   { year:2020.04, type:'eliminated',
     title:'Soleimani killed',
     sub:'3 January 2020 — US drone strike, Baghdad',
     body:"US drone strike kills the Quds Force commander. Vahidi had built the Quds Force from scratch; Soleimani ran it for two decades. His death removes the most capable node in the outer network." },
-
   { year:2021.65, type:'milestone',
     title:'Raisi Government',
     sub:'August 2021 — all three converge on SNSC',
     body:"For the first time, all three axes of the coercive state are simultaneously controlled by IRGC-rooted figures. Ghalibaf as Speaker. Eje'i as Judiciary Chief. Vahidi as Interior Minister. All three on the SNSC." },
-
   { year:2022.75, type:'repression',
     title:'Mahsa (Jina) Amini uprising',
     sub:'"Woman, Life, Freedom" — 500+ killed',
     body:"Full coercive lockstep for the first time. Legislative cover from Ghalibaf, judicial no-leniency from Eje'i, LEC command chain held intact by Vahidi. Three pillars operating as one." },
-
   { year:2024.4,  type:'eliminated',
     title:'Raisi killed',
     sub:'Helicopter crash, May 2024',
-    body:"President Raisi dies in a helicopter crash. Removes another outer node. The system absorbs it without structural change — the three principals hold. The first sign that the inner core is self-sufficient." },
-
-  // War events — rendered at top, explicit label positions
+    body:"President Raisi dies in a helicopter crash. Removes another outer node. The system absorbs it without structural change — the three principals hold." },
   { year:2025.45, type:'war', isWar:true,
     title:'12-Day War',
     sub:'June 2025 — Israeli strikes on Iran',
     body:"Israel strikes Iran in a sustained air campaign. IRGC Commander-in-Chief Hossein Salami killed. Vahidi emerges as effective IRGC commander. The war accelerates the narrowing already underway." },
-
   { year:2026.12, type:'war', isWar:true,
     title:'US-Israeli campaign',
     sub:'Feb 2026 — sustained strikes',
     body:"Sustained US-Israeli strikes on Iranian military infrastructure, nuclear sites, and command nodes. The war compresses all dynamics — removing the regime's ability to manage the internal instability it has already been forced to reveal." },
-
-  // 2026 dense cluster — staggered dots, labels fanned left and right
   { year:2026.0,  type:'repression', cluster:true, dotYOff:0,
     title:'Jan 2026 massacre',
     sub:'Over 30,000 killed',
     body:"The terminal repression event. Eje'i: 'If we want to do something, we have to do it fast.' Ghalibaf provides parliamentary cover. Vahidi holds the IRGC command chain. Over 30,000 killed in the opening weeks." },
-
   { year:2026.08, type:'eliminated', cluster:true, dotYOff:22,
     title:'Khamenei killed',
     sub:'28 February 2026 — Israeli strike',
     body:"The ultimate arbiter eliminated. The one figure who could hold competing factions in equilibrium is gone. The system no longer has an apex mediator. What remains is the hard core." },
-
   { year:2026.22, type:'eliminated', cluster:true, dotYOff:44,
     title:'Larijani killed',
     sub:'17 March 2026 — Israeli strike',
     body:"The last mediator gone. Larijani translated hardline positions into language Western foreign ministers could engage with. That service is now gone entirely." },
-
   { year:2026.35, type:'milestone', cluster:true, dotYOff:66,
     title:'Mojtaba Khamenei installed',
     sub:'March 2026',
     body:"Ghalibaf, Vahidi and Taeb as principal campaigners. Eje'i holds sovereign authority on the Interim Leadership Council. A cartel installing a controllable placeholder while real power sits one step removed." },
 ];
 
-// Pre-compute x for all events
-EVENTS.forEach(e => { e._x = xOf(e.year); });
-
-// ── War label positions — text only, no pill, open away from each other ──
-// War1 x≈668: label right-aligned just left of line
-// War2 x≈703: label left-aligned just right of line
-const WAR_Y = 20;
-const WAR_LABEL_YS = [16, 36];
-EVENTS.filter(e=>e.isWar).forEach((e, i) => {
-  if (i === 0) {
-    e._warAlign  = 'right';   // war1: text opens leftward
-    e._warLabelX = e._x - 6;
-  } else {
-    e._warAlign  = 'left';    // war2: text opens rightward into right margin
-    e._warLabelX = e._x + 6;
-  }
-  e._warLabelY = WAR_LABEL_YS[i];
-});
-
-// ── Cluster label positions — all fanned to the left, unique y rows ──
-// Labels spread across x=400–670, each on its own descending y row below dots.
-const CLUSTER_LBL_XS  = [560, 460, 560, 460]; // two alternating columns, all left of dot cluster
-const CLUSTER_LBL_ROW_H = 30;
-
-EVENTS.filter(e=>e.cluster).forEach((e, i) => {
-  e._dotX = e._x;
-  e._dotY = EVT_DOT_Y + e.dotYOff;
-  e._lblX    = CLUSTER_LBL_XS[i];
-  // Rows 0 and 2 share x=560; rows 1 and 3 share x=460.
-  // Give each its own y, spaced enough that same-column labels don't touch.
-  e._lblY    = EVT_DOT_Y + i * CLUSTER_LBL_ROW_H + 22;
-  e._lblAlign = 'center';
-});
-
-// ── Standard event label placement ───────────────────────────
-// Place labels above or below EVT_DOT_Y, one per vertical slot.
-// Slots: levels 0,1,2... above and below. Each level = 28px further from dot row.
-// Greedy left-to-right assignment.
-const LBL_LEVEL_H = 26, LBL_SLOT_W = 90;
-const slots = { up:[], down:[] };
-EVENTS.filter(e => !e.isWar && !e.cluster).forEach(e => {
-  const x1 = e._x - LBL_SLOT_W/2, x2 = e._x + LBL_SLOT_W/2;
-  let placed = false;
-  for (let lvl = 0; lvl < 8 && !placed; lvl++) {
-    for (const dir of ['up','down']) {
-      if (!slots[dir][lvl]) slots[dir][lvl] = [];
-      if (slots[dir][lvl].every(([a,b]) => x2+4 < a || x1-4 > b)) {
-        slots[dir][lvl].push([x1, x2]);
-        e._lblDir = dir;
-        e._lblLvl = lvl;
-        placed = true;
-        break;
-      }
+// ── Split axis xOf — must reference dynamic TL_LEFT/TL_W ─────
+const SEG = [
+  { from:2009, to:2014,   frac:0.30, x0:0    },
+  { from:2014, to:2019,   frac:0.08, x0:0.30 },
+  { from:2019, to:2026.6, frac:0.62, x0:0.38 },
+];
+function xOf(year) {
+  for (let i = 0; i < SEG.length; i++) {
+    const s = SEG[i];
+    if (year <= s.to || i === SEG.length-1) {
+      const t = Math.max(0, Math.min(1, (year - s.from) / (s.to - s.from)));
+      return TL_LEFT + (s.x0 + t * s.frac) * TL_W;
     }
   }
-  if (!placed) { e._lblDir = 'down'; e._lblLvl = 7; }
-});
+  return TL_RIGHT;
+}
 
-let activeEvent = null;
+const WAR_Y = 20; // reference constant for hit detection
+let W, H, TL_LEFT, TL_RIGHT, TL_W, AXIS_Y, LANE_TOP, LANE_BOTTOM,
+    EVT_DOT_Y, LBL_LEVEL_H, laidOutEvents, activeEvent = null;
+
+function computeLayout() {
+  W = canvas.parentElement.clientWidth || 752;
+  // Scale down vertical proportionally but set a min height
+  const scale = Math.min(W / 752, 1);
+  H = Math.round(560 * Math.max(scale, 0.55));
+
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.height = H + 'px';
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(DPR, DPR);
+
+  // Axis margins scale with W
+  const leftMargin  = Math.max(W * 0.115, 60);
+  const rightMargin = Math.max(W * 0.04,  20);
+  TL_LEFT  = Math.round(leftMargin);
+  TL_RIGHT = Math.round(W - rightMargin);
+  TL_W     = TL_RIGHT - TL_LEFT;
+  AXIS_Y   = Math.round(H * 0.14);
+  LANE_TOP = Math.round(H * 0.21);
+  LBL_LEVEL_H = Math.round(H * 0.046);
+
+  // Recompute principal lane y positions
+  let yRunner = LANE_TOP;
+  PRINCIPALS.forEach(p => {
+    const maxRow = Math.max(...p.roles.map(r => r.row));
+    p.yTop = yRunner;
+    p.yBot = yRunner + (maxRow+1)*(ROW_H+ROW_GAP) - ROW_GAP;
+    p.yCen = (p.yTop + p.yBot) / 2;
+    yRunner = p.yBot + LANE_PAD;
+  });
+  LANE_BOTTOM = yRunner + 6;
+  EVT_DOT_Y   = LANE_BOTTOM + Math.round(H * 0.05);
+
+  // Recompute all event x positions
+  EVENTS.forEach(e => { e._x = xOf(e.year); });
+
+  // War labels
+  const WAR_LABEL_YS = [Math.round(H*0.028), Math.round(H*0.065)];
+  EVENTS.filter(e=>e.isWar).forEach((e, i) => {
+    e._warAlign  = i === 0 ? 'right' : 'left';
+    e._warLabelX = i === 0 ? e._x - 6 : e._x + 6;
+    e._warLabelY = WAR_LABEL_YS[i];
+  });
+
+  // Cluster labels — fan left, scaled to W
+  const clusterDotX = xOf(2026.1);
+  const clusterLblXs = [
+    Math.round(clusterDotX - W*0.18),
+    Math.round(clusterDotX - W*0.32),
+    Math.round(clusterDotX - W*0.18),
+    Math.round(clusterDotX - W*0.32),
+  ];
+  const CLUSTER_LBL_ROW_H = Math.round(H * 0.054);
+  EVENTS.filter(e=>e.cluster).forEach((e, i) => {
+    e._dotX = e._x;
+    e._dotY = EVT_DOT_Y + Math.round(e.dotYOff * Math.min(W/752, 1));
+    e._lblX = clusterLblXs[i];
+    e._lblY = EVT_DOT_Y + i * CLUSTER_LBL_ROW_H + Math.round(H * 0.04);
+  });
+
+  // Standard event label slots
+  const slots = { up:[], down:[] };
+  const LBL_SLOT_W = Math.max(W * 0.115, 72);
+  EVENTS.filter(e => !e.isWar && !e.cluster).forEach(e => {
+    const x1 = e._x - LBL_SLOT_W/2, x2 = e._x + LBL_SLOT_W/2;
+    let placed = false;
+    for (let lvl = 0; lvl < 8 && !placed; lvl++) {
+      for (const dir of ['up','down']) {
+        if (!slots[dir][lvl]) slots[dir][lvl] = [];
+        if (slots[dir][lvl].every(([a,b]) => x2+4 < a || x1-4 > b)) {
+          slots[dir][lvl].push([x1, x2]);
+          e._lblDir = dir; e._lblLvl = lvl;
+          placed = true; break;
+        }
+      }
+    }
+    if (!placed) { e._lblDir = 'down'; e._lblLvl = 7; }
+  });
+
+  laidOutEvents = EVENTS.map(e => ({...e}));
+}
 
 // ── Draw helpers ──────────────────────────────────────────────
 function wrapText(text, x, y, maxW, lineH, anchor) {
@@ -575,11 +566,41 @@ canvas.addEventListener('mousemove', ev => {
   }
   canvas.style.cursor = hit?'pointer':'default';
 });
-canvas.addEventListener('mouseleave',()=>{
-  // don't hide on mouseleave — let user read the panel
-  canvas.style.cursor='default';
+
+// Touch support
+canvas.addEventListener('touchstart', ev => {
+  ev.preventDefault();
+  const rect=canvas.getBoundingClientRect();
+  const t=ev.touches[0];
+  const mx=(t.clientX-rect.left)*(W/rect.width);
+  const my=(t.clientY-rect.top)*(H/rect.height);
+  let hit=null;
+  EVENTS.forEach(e => {
+    if (e.isWar) {
+      if (Math.abs(mx-e._x)<18 && my>=e._warLabelY && my<=AXIS_Y) hit=e;
+    } else if (e.cluster) {
+      if (Math.hypot(mx-e._dotX, my-e._dotY)<16) hit=e;
+    } else {
+      if (Math.hypot(mx-e._x, my-EVT_DOT_Y)<16) hit=e;
+    }
+  });
+  if (hit) { activeEvent=hit; draw(); showPanel(hit); }
+}, { passive:false });
+
+canvas.addEventListener('mouseleave',()=>{ canvas.style.cursor='default'; });
+
+// Resize handler
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    computeLayout();
+    draw();
+  }, 80);
 });
 
+// Init
+computeLayout();
 draw();
 })();
 </script>
