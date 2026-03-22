@@ -58,7 +58,7 @@ canvas{display:block;width:100%;cursor:default}
     <div id="detail-body"></div>
   </div>
   <canvas id="c"></canvas>
-  <p class="hover-hint">↑ Hover or tap any marker for analysis</p>
+  <p class="hover-hint" id="hover-hint">☝&#xFE0E; Hover or tap any marker for analysis</p>
 </div>
 </div>
 <div id="tip"></div>
@@ -174,9 +174,10 @@ let W, H, TL_LEFT, TL_RIGHT, TL_W, AXIS_Y, LANE_TOP, LANE_BOTTOM,
 
 function computeLayout() {
   W = canvas.parentElement.clientWidth || 752;
-  // Scale down vertical proportionally but set a min height
-  const scale = Math.min(W / 752, 1);
-  H = Math.round(560 * Math.max(scale, 0.55));
+  const mobile = W < 420;
+
+  // Fixed heights that are guaranteed to fit content
+  H = mobile ? 480 : 560;
 
   canvas.width  = W * DPR;
   canvas.height = H * DPR;
@@ -184,73 +185,89 @@ function computeLayout() {
   ctx.setTransform(1,0,0,1,0,0);
   ctx.scale(DPR, DPR);
 
-  // Axis margins scale with W
-  const leftMargin  = Math.max(W * 0.115, 60);
-  const rightMargin = Math.max(W * 0.04,  20);
-  TL_LEFT  = Math.round(leftMargin);
-  TL_RIGHT = Math.round(W - rightMargin);
+  // Margins
+  TL_LEFT  = mobile ? 58 : Math.round(W * 0.145);  // wider left margin for long names
+  TL_RIGHT = mobile ? W - 20 : W - 30;
   TL_W     = TL_RIGHT - TL_LEFT;
-  AXIS_Y   = Math.round(H * 0.14);
-  LANE_TOP = Math.round(H * 0.21);
-  LBL_LEVEL_H = Math.round(H * 0.046);
 
-  // Recompute principal lane y positions
+  // Vertical anchors — fixed pixel values on mobile, proportional on desktop
+  AXIS_Y    = mobile ? 50  : 78;
+  LANE_TOP  = mobile ? 72  : 116;
+  LBL_LEVEL_H = mobile ? 22 : 26;
+
+  // Principal lane heights
+  // On mobile: only draw row 0 (primary role bar) — no stacked rows
+  // This keeps each principal to exactly ROW_H tall
   let yRunner = LANE_TOP;
   PRINCIPALS.forEach(p => {
-    const maxRow = Math.max(...p.roles.map(r => r.row));
+    const maxRow = mobile ? 0 : Math.max(...p.roles.map(r => r.row));
     p.yTop = yRunner;
-    p.yBot = yRunner + (maxRow+1)*(ROW_H+ROW_GAP) - ROW_GAP;
+    p.yBot = yRunner + (maxRow + 1) * (ROW_H + ROW_GAP) - ROW_GAP;
     p.yCen = (p.yTop + p.yBot) / 2;
-    yRunner = p.yBot + LANE_PAD;
+    yRunner = p.yBot + (mobile ? 18 : LANE_PAD);
   });
   LANE_BOTTOM = yRunner + 6;
-  EVT_DOT_Y   = LANE_BOTTOM + Math.round(H * 0.05);
+
+  // Event dot baseline — fixed gap below lanes
+  EVT_DOT_Y = LANE_BOTTOM + (mobile ? 28 : 28);
 
   // Recompute all event x positions
   EVENTS.forEach(e => { e._x = xOf(e.year); });
 
-  // War labels
-  const WAR_LABEL_YS = [Math.round(H*0.028), Math.round(H*0.065)];
+  // War labels — fixed y positions that don't compress on mobile
+  const WAR_LABEL_YS = mobile ? [10, 28] : [16, 36];
   EVENTS.filter(e=>e.isWar).forEach((e, i) => {
     e._warAlign  = i === 0 ? 'right' : 'left';
     e._warLabelX = i === 0 ? e._x - 6 : e._x + 6;
     e._warLabelY = WAR_LABEL_YS[i];
   });
 
-  // Cluster labels — fan left, scaled to W
+  // Cluster labels — fan left of dot cluster
+  // On mobile scale the dotYOff and fan distance with W ratio
+  const mobRatio = mobile ? (W / 752) : 1;
   const clusterDotX = xOf(2026.1);
-  const clusterLblXs = [
-    Math.round(clusterDotX - W*0.18),
-    Math.round(clusterDotX - W*0.32),
-    Math.round(clusterDotX - W*0.18),
-    Math.round(clusterDotX - W*0.32),
-  ];
-  const CLUSTER_LBL_ROW_H = Math.round(H * 0.054);
+  // Two alternating x columns, scaled by W
+  const fanA = Math.round(clusterDotX - W * (mobile ? 0.16 : 0.18));
+  const fanB = Math.round(clusterDotX - W * (mobile ? 0.30 : 0.32));
+  const CLUSTER_LBL_ROW_H = mobile ? 28 : 30;
+
   EVENTS.filter(e=>e.cluster).forEach((e, i) => {
     e._dotX = e._x;
-    e._dotY = EVT_DOT_Y + Math.round(e.dotYOff * Math.min(W/752, 1));
-    e._lblX = clusterLblXs[i];
-    e._lblY = EVT_DOT_Y + i * CLUSTER_LBL_ROW_H + Math.round(H * 0.04);
+    e._dotY = EVT_DOT_Y + Math.round(e.dotYOff * (mobile ? 0.64 : 1));
+    e._lblX = i % 2 === 0 ? fanA : fanB;
+    e._lblY = EVT_DOT_Y + i * CLUSTER_LBL_ROW_H + (mobile ? 16 : 22);
   });
 
-  // Standard event label slots
-  const slots = { up:[], down:[] };
-  const LBL_SLOT_W = Math.max(W * 0.115, 72);
-  EVENTS.filter(e => !e.isWar && !e.cluster).forEach(e => {
-    const x1 = e._x - LBL_SLOT_W/2, x2 = e._x + LBL_SLOT_W/2;
-    let placed = false;
-    for (let lvl = 0; lvl < 8 && !placed; lvl++) {
-      for (const dir of ['up','down']) {
-        if (!slots[dir][lvl]) slots[dir][lvl] = [];
-        if (slots[dir][lvl].every(([a,b]) => x2+4 < a || x1-4 > b)) {
-          slots[dir][lvl].push([x1, x2]);
-          e._lblDir = dir; e._lblLvl = lvl;
-          placed = true; break;
+  // Standard event label slots — desktop only (mobile suppresses all labels)
+  if (!mobile) {
+    const slots = { up:[], down:[] };
+    const LBL_SLOT_W = 90;
+    EVENTS.filter(e => !e.isWar && !e.cluster).forEach(e => {
+      const x1 = e._x - LBL_SLOT_W/2, x2 = e._x + LBL_SLOT_W/2;
+      let placed = false;
+      for (let lvl = 0; lvl < 8 && !placed; lvl++) {
+        for (const dir of ['up','down']) {
+          if (!slots[dir][lvl]) slots[dir][lvl] = [];
+          if (slots[dir][lvl].every(([a,b]) => x2+4 < a || x1-4 > b)) {
+            slots[dir][lvl].push([x1, x2]);
+            e._lblDir = dir; e._lblLvl = lvl;
+            placed = true; break;
+          }
         }
       }
-    }
-    if (!placed) { e._lblDir = 'down'; e._lblLvl = 7; }
-  });
+      if (!placed) { e._lblDir = 'down'; e._lblLvl = 7; }
+    });
+  } else {
+    // Mobile: stem labels — each non-war event gets a vertical stem to a unique y level
+    // Sort all non-war events by x position, assign descending stem levels
+    const nonWarEvts = EVENTS.filter(e => !e.isWar).sort((a, b) => a._x - b._x);
+    const usableH = (H - 32) - EVT_DOT_Y; // space below dot row to legend
+    const step = Math.floor(usableH / nonWarEvts.length);
+    nonWarEvts.forEach((e, i) => {
+      e._stemY  = EVT_DOT_Y + step * (i + 1);
+      e._stemAlign = e._x < W / 2 ? 'left' : 'right';
+    });
+  }
 
   laidOutEvents = EVENTS.map(e => ({...e}));
 }
@@ -264,6 +281,12 @@ function wrapText(text, x, y, maxW, lineH, anchor) {
   });
   if (cur) lines.push(cur);
   const ls = lines.slice(0, 3);
+  if (anchor === 'middle-wrap') {
+    // centre-aligned vertically around y
+    const th = (ls.length - 1) * lineH;
+    ls.forEach((l, i) => ctx.fillText(l, x, y - th/2 + i * lineH));
+    return;
+  }
   if (anchor === 'bottom') ls.reverse();
   const sign = anchor === 'bottom' ? -1 : 1;
   ls.forEach((l, i) => ctx.fillText(l, x, y + sign * i * lineH));
@@ -273,6 +296,7 @@ function wrapText(text, x, y, maxW, lineH, anchor) {
 function draw() {
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  const mobile = W < 420;
 
   // ── Axis ──
   const breakX1 = xOf(2014), breakX2 = xOf(2019);
@@ -287,7 +311,6 @@ function draw() {
   ctx.font="400 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='top';
   ctx.fillText('2014 – 2019', bx, AXIS_Y+8); ctx.restore();
 
-  const mobile = W < 500;
   const tickYears = mobile
     ? [2009,2011,2013,2014,2019,2020,2022,2024,2026]
     : [2009,2010,2011,2012,2013,2014,2019,2020,2021,2022,2023,2024,2025,2026];
@@ -302,18 +325,32 @@ function draw() {
   // narrowing tint
   const nX1 = xOf(2019.8), nX2 = xOf(2026.6);
   ctx.save(); ctx.globalAlpha=0.04; ctx.fillStyle=TYPE_COL.eliminated;
-  ctx.fillRect(nX1, AXIS_Y+1, nX2-nX1, EVT_DOT_Y+80-AXIS_Y); ctx.restore();
+  ctx.fillRect(nX1, AXIS_Y+1, nX2-nX1, Math.min(EVT_DOT_Y+80, H-36)-AXIS_Y); ctx.restore();
   ctx.save(); ctx.font="500 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle='rgba(139,26,26,0.28)';
   ctx.textAlign='center'; ctx.textBaseline='top';
   ctx.fillText('THE NARROWING', (nX1+nX2)/2, AXIS_Y+6); ctx.restore();
 
   // ── Principal lanes ──
   PRINCIPALS.forEach(p => {
-    ctx.font="600 10px 'Source Sans 3',sans-serif";
+    // Principal name — split onto two lines if too wide for margin
+    ctx.font = `600 ${mobile?8:10}px 'Source Sans 3',sans-serif`;
     ctx.fillStyle=p.col; ctx.textAlign='right'; ctx.textBaseline='middle';
-    ctx.fillText(p.label, TL_LEFT-8, p.yCen);
+    const maxLblW = TL_LEFT - 12;
+    if (ctx.measureText(p.label).width <= maxLblW) {
+      ctx.fillText(p.label, TL_LEFT-8, p.yCen);
+    } else {
+      // split at hyphen or midpoint
+      const hyphen = p.label.indexOf('-');
+      const splitAt = hyphen > 0 ? hyphen + 1 : Math.ceil(p.label.length / 2);
+      const line1 = p.label.slice(0, splitAt);
+      const line2 = p.label.slice(splitAt);
+      ctx.font = `600 ${mobile?7:9}px 'Source Sans 3',sans-serif`;
+      ctx.fillText(line1, TL_LEFT-8, p.yCen - 5);
+      ctx.fillText(line2, TL_LEFT-8, p.yCen + 6);
+    }
 
     p.roles.forEach(role => {
+      if (mobile && role.row > 0) return; // only primary bar on mobile
       const x1=xOf(role.from), x2=xOf(role.to), bw=x2-x1;
       if (bw<1) return;
       const yTop = p.yTop + role.row*(ROW_H+ROW_GAP);
@@ -327,9 +364,9 @@ function draw() {
         ctx.setLineDash([4,4]); ctx.beginPath(); ctx.roundRect(x1,yTop,bw,bh,2); ctx.stroke(); ctx.setLineDash([]);
       }
       ctx.restore();
-      if (role.solid && !mobile) {
+      if (role.solid) {
         ctx.save();
-        ctx.font = "300 7.5px 'Source Sans 3',sans-serif";
+        ctx.font = `300 ${mobile?6.5:7.5}px 'Source Sans 3',sans-serif`;
         ctx.globalAlpha = 0.88;
         if (bw > 32) {
           // label inside bar
@@ -378,23 +415,22 @@ function draw() {
     ctx.setLineDash([]);
     ctx.lineWidth=isActive?2:1.2; ctx.globalAlpha=isActive?0.75:0.4;
     ctx.beginPath(); ctx.moveTo(x-5, ev._warLabelY+12); ctx.lineTo(x+5, ev._warLabelY+12); ctx.stroke();
-    if (!mobile) {
-      ctx.globalAlpha=isActive?1:0.76;
-      ctx.font=`${isActive?600:500} 8px 'Source Sans 3',sans-serif`;
-      ctx.fillStyle=col; ctx.textAlign=ev._warAlign; ctx.textBaseline='alphabetic';
-      const titleWords = ev.title.split(' ');
-      const mid = Math.ceil(titleWords.length / 2);
-      const line1 = titleWords.slice(0, mid).join(' ');
-      const line2 = titleWords.slice(mid).join(' ');
-      if (line2) {
-        ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 5);
-        ctx.fillText(line2, ev._warLabelX, ev._warLabelY + 5 + 10);
-      } else {
-        ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 12);
-      }
-      ctx.font=`300 7px 'IBM Plex Mono',monospace`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
-      ctx.fillText(ev.sub.split('—')[0].trim(), ev._warLabelX, ev._warLabelY + (line2 ? 28 : 21));
+    // war label text — always shown, size scales with W
+    ctx.globalAlpha=isActive?1:0.76;
+    ctx.font=`${isActive?600:500} ${mobile?7:8}px 'Source Sans 3',sans-serif`;
+    ctx.fillStyle=col; ctx.textAlign=ev._warAlign; ctx.textBaseline='alphabetic';
+    const titleWords = ev.title.split(' ');
+    const mid = Math.ceil(titleWords.length / 2);
+    const line1 = titleWords.slice(0, mid).join(' ');
+    const line2 = titleWords.slice(mid).join(' ');
+    if (line2) {
+      ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 5);
+      ctx.fillText(line2, ev._warLabelX, ev._warLabelY + 5 + 10);
+    } else {
+      ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 12);
     }
+    ctx.font=`300 ${mobile?6:7}px 'IBM Plex Mono',monospace`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
+    ctx.fillText(ev.sub.split('—')[0].trim(), ev._warLabelX, ev._warLabelY + (line2 ? 28 : 21));
     ctx.restore();
   });
 
@@ -460,29 +496,63 @@ function draw() {
     ctx.restore();
   });
 
-  // ── Standard event labels (desktop only) ──
-  if (!mobile) EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
-    const x=ev._x, col=TYPE_COL[ev.type], isActive=activeEvent===ev;
-    const dotR=5, isUp=ev._lblDir==='up', lvl=ev._lblLvl||0;
-    const lvlOff=dotR+6+lvl*LBL_LEVEL_H;
-    const lblY=isUp?EVT_DOT_Y-lvlOff:EVT_DOT_Y+lvlOff;
-    const anchor=isUp?'bottom':'top';
-    ctx.save(); ctx.globalAlpha=isActive?1:0.72;
-    ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
-    ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline=anchor;
-    wrapText(ev.title, x, lblY, 82, 11, anchor);
-    ctx.restore();
-  });
+  // ── Standard event labels ──
+  if (!mobile) {
+    EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
+      const x=ev._x, col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+      const dotR=5, isUp=ev._lblDir==='up', lvl=ev._lblLvl||0;
+      const lvlOff=dotR+6+lvl*LBL_LEVEL_H;
+      const lblY=isUp?EVT_DOT_Y-lvlOff:EVT_DOT_Y+lvlOff;
+      const anchor=isUp?'bottom':'top';
+      ctx.save(); ctx.globalAlpha=isActive?1:0.72;
+      ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
+      ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline=anchor;
+      wrapText(ev.title, x, lblY, 82, 11, anchor);
+      ctx.restore();
+    });
 
-  // ── Cluster event labels (desktop only) ──
-  if (!mobile) EVENTS.filter(e=>e.cluster).forEach(ev => {
-    const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
-    ctx.save(); ctx.globalAlpha=isActive?1:0.75;
-    ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
-    ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline='middle';
-    wrapText(ev.title, ev._lblX, ev._lblY, 88, 11, 'middle-wrap');
-    ctx.restore();
-  });
+    // ── Cluster event labels (desktop) ──
+    EVENTS.filter(e=>e.cluster).forEach(ev => {
+      const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+      ctx.save(); ctx.globalAlpha=isActive?1:0.75;
+      ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
+      ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline='middle';
+      wrapText(ev.title, ev._lblX, ev._lblY, 88, 11, 'middle-wrap');
+      ctx.restore();
+    });
+  } else {
+    // ── Mobile stem labels — vertical stems to unique y levels ──
+    EVENTS.filter(e=>!e.isWar&&e._stemY).forEach(ev => {
+      const x=ev._x, dotY=ev.cluster?ev._dotY:EVT_DOT_Y;
+      const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
+      const stemY=ev._stemY, align=ev._stemAlign;
+
+      // vertical stem from dot down to label level
+      ctx.save();
+      ctx.strokeStyle=col; ctx.lineWidth=isActive?1.2:0.7;
+      ctx.globalAlpha=isActive?0.7:0.28;
+      ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(x, dotY+5); ctx.lineTo(x, stemY); ctx.stroke();
+      // horizontal tick at label level
+      ctx.setLineDash([]);
+      ctx.lineWidth=isActive?1.2:0.7;
+      ctx.beginPath();
+      if (align==='left') { ctx.moveTo(x, stemY); ctx.lineTo(x+6, stemY); }
+      else                { ctx.moveTo(x, stemY); ctx.lineTo(x-6, stemY); }
+      ctx.stroke();
+      ctx.restore();
+
+      // label text
+      ctx.save();
+      ctx.globalAlpha=isActive?1:0.75;
+      ctx.font=`${isActive?500:400} 7px 'Source Sans 3',sans-serif`;
+      ctx.fillStyle=col;
+      ctx.textAlign=align; ctx.textBaseline='middle';
+      const lx = align==='left' ? x+8 : x-8;
+      ctx.fillText(ev.title, lx, stemY);
+      ctx.restore();
+    });
+  }
 
   // ── Legend ──
   const legY = H - (mobile ? 22 : 30);
@@ -500,36 +570,15 @@ function draw() {
     lx += ctx.measureText(it.label).width + (mobile?16:30);
   });
 
-  // Mobile: "tap dots" hint
-  if (mobile) {
+  // Mobile: "tap dots" hint — positioned safely between lane bottom and dot row
+  if (mobile && EVT_DOT_Y - LANE_BOTTOM > 20) {
     ctx.save();
     ctx.font="300 7px 'IBM Plex Mono',monospace";
-    ctx.fillStyle='rgba(154,151,149,0.7)';
+    ctx.fillStyle='rgba(154,151,149,0.65)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('TAP ANY DOT FOR ANALYSIS', W/2, EVT_DOT_Y - 14);
+    ctx.fillText('HOVER OR TAP ANY DOT FOR ANALYSIS', W/2, LANE_BOTTOM + Math.round((EVT_DOT_Y - LANE_BOTTOM)/2));
     ctx.restore();
   }
-}
-
-// Override wrapText for cluster labels (right-aligned, multi-line from centre)
-const _wrapText = wrapText;
-function wrapText(text, x, y, maxW, lineH, anchor) {
-  if (anchor === 'middle-wrap') {
-    const words=text.split(' '), lines=[]; let cur='';
-    ctx.textBaseline='middle';
-    words.forEach(w=>{ const t=cur?cur+' '+w:w; if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else cur=t; });
-    if(cur)lines.push(cur);
-    const ls=lines.slice(0,3), th=(ls.length-1)*lineH;
-    ls.forEach((l,i)=>ctx.fillText(l,x,y-th/2+i*lineH));
-    return;
-  }
-  const words=text.split(' '), lines=[]; let cur='';
-  words.forEach(w=>{ const t=cur?cur+' '+w:w; if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else cur=t; });
-  if(cur)lines.push(cur);
-  const ls=lines.slice(0,3);
-  if(anchor==='bottom') ls.reverse();
-  const sign=anchor==='bottom'?-1:1;
-  ls.forEach((l,i)=>ctx.fillText(l,x,y+sign*i*lineH));
 }
 
 // ── Interaction ───────────────────────────────────────────────

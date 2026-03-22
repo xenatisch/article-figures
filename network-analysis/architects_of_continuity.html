@@ -304,25 +304,43 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 #tip em { font-style: normal; font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: #888; display: block; margin-bottom: 8px; letter-spacing: .05em; }
 
 /* ── MOBILE TAB SWITCHER ── */
+/* Tab bar lives inside .grid, sticks to page top when scrolled there */
 .tab-bar {
   display: none;
   position: sticky; top: 0; z-index: 25;
   background: #f7f4ee;
   border-bottom: 2px solid #c0bbb2;
-  padding: 0;
+  border-top: 1px solid #c0bbb2;
+  gap: 6px;
+  padding: 6px 8px 0;
 }
 .tab-bar button {
-  flex: 1; border: none; background: none; cursor: pointer;
-  padding: 10px 6px 8px;
-  font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500;
-  letter-spacing: .06em; text-transform: uppercase; color: #9e9b95;
-  border-bottom: 3px solid transparent; margin-bottom: -2px;
-  transition: color .15s, border-color .15s;
+  flex: 1; border: 1px solid #c0bbb2; cursor: pointer;
+  padding: 9px 4px 7px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 8px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase;
+  border-radius: 4px 4px 0 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: background .15s, color .15s, border-color .15s;
+  color: #9e9b95;
 }
-.tab-bar button.active { color: #1a1814; }
-.tab-bar button[data-tab="G"].active { border-color: #b06000; color: #b06000; }
-.tab-bar button[data-tab="E"].active { border-color: #1e4f8a; color: #1e4f8a; }
-.tab-bar button[data-tab="V"].active { border-color: #1a4a2e; color: #1a4a2e; }
+/* each button always has a faint tint so users see them as distinct */
+.tab-bar button[data-tab="G"] { background: rgba(176,96,0,0.07); border-color: rgba(176,96,0,0.25); }
+.tab-bar button[data-tab="E"] { background: rgba(30,79,138,0.07); border-color: rgba(30,79,138,0.25); }
+.tab-bar button[data-tab="V"] { background: rgba(26,74,46,0.07);  border-color: rgba(26,74,46,0.25);  }
+/* active: stronger tint, solid bottom border */
+.tab-bar button[data-tab="G"].active { background: rgba(176,96,0,0.16); border-color: #b06000; border-bottom-color: #b06000; color: #b06000; }
+.tab-bar button[data-tab="E"].active { background: rgba(30,79,138,0.16); border-color: #1e4f8a; border-bottom-color: #1e4f8a; color: #1e4f8a; }
+.tab-bar button[data-tab="V"].active { background: rgba(26,74,46,0.16);  border-color: #1a4a2e; border-bottom-color: #1a4a2e; color: #1a4a2e;  }
+/* sub-label: "tap" for inactive, checkmark for active */
+.tab-bar button::after {
+  content: '☝\FE0E  tap to switch';
+  display: block; font-size: 9px; letter-spacing: .04em;
+  opacity: 0.72; margin-top: 3px; font-weight: 400;
+  color: #3a3835;
+}
+.tab-bar button.active::after { content: '✓ viewing'; opacity: 0.82; color: inherit; }
 
 /* mobile drawer */
 #mob-drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.38); z-index:998; }
@@ -346,66 +364,91 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   .ch-role { font-size: 9px; }
 }
 
-/* mobile: single-column view with tabs */
+/* ── MOBILE: single-column with tabs ── */
 @media (max-width: 500px) {
   .page { padding: 0 12px 48px; }
   h1 { font-size: 20px; }
   .deck { font-size: 12px; }
   .tab-bar { display: flex; }
 
-  /* hide the col-heads sticky row — replaced by tab bar */
+  /* col-heads: hide the desktop sticky header on mobile */
   .col-heads { display: none; }
-  /* hide section spacer cols */
+
+  /* section headers: simple block */
   .sec { display: block; }
   .sec-col { display: none; }
   .sec-label { padding: 7px 12px; font-size: 13px; }
 
-  /* rows: show label + only the active principal column */
+  /* rows: label (with mini connection dots) + active column */
   .row {
     display: grid;
-    grid-template-columns: 120px 1fr;
+    grid-template-columns: 110px 1fr;
   }
-  .lbl { width:120px; min-width:120px; max-width:120px; padding:9px 10px; }
+  .lbl {
+    width: 110px; min-width: 110px; max-width: 110px;
+    padding: 8px 8px 8px 10px;
+  }
 
-  /* hide all principal cells by default; JS adds .mob-show to active column */
+  /* hide all principal cells; JS adds .mob-show to active one */
   .cell.col-g, .cell.col-e, .cell.col-v { display: none; }
   .cell.col-g.mob-show, .cell.col-e.mob-show, .cell.col-v.mob-show { display: block; }
+
+  /* active cell: coloured left border matching the active principal */
+  .cell.col-g.mob-show { border-left: 3px solid #b06000 !important; }
+  .cell.col-e.mob-show { border-left: 3px solid #1e4f8a !important; }
+  .cell.col-v.mob-show { border-left: 3px solid #1a4a2e !important; }
 
   /* bands similarly */
   .band {
     display: grid;
-    grid-template-columns: 120px 1fr;
+    grid-template-columns: 110px 1fr;
   }
-  .band-lbl { width:120px; min-width:120px; max-width:120px; padding:9px 10px; }
+  .band-lbl { width:110px; min-width:110px; max-width:110px; padding:8px 8px 8px 10px; }
   .band-cell.col-g, .band-cell.col-e, .band-cell.col-v { display: none; }
   .band-cell.col-g.mob-show, .band-cell.col-e.mob-show, .band-cell.col-v.mob-show { display: block; }
+  .band-cell.col-g.mob-show { border-left: 3px solid #b06000 !important; }
+  .band-cell.col-e.mob-show { border-left: 3px solid #1e4f8a !important; }
+  .band-cell.col-v.mob-show { border-left: 3px solid #1a4a2e !important; }
 
-  /* colour top border for active column */
-  .cell.col-g.mob-show, .band-cell.col-g.mob-show { border-left: 3px solid #b06000 !important; }
-  .cell.col-e.mob-show, .band-cell.col-e.mob-show { border-left: 3px solid #1e4f8a !important; }
-  .cell.col-v.mob-show, .band-cell.col-v.mob-show { border-left: 3px solid #1a4a2e !important; }
+  /* connection dots in label column — shown on mobile to indicate which
+     other principals share this node, even when their column is hidden */
+  .mob-conn-dots {
+    display: flex; gap: 3px; margin-top: 5px; flex-wrap: wrap;
+  }
+  .mob-conn-dot {
+    width: 6px; height: 6px; border-radius: 50%; opacity: 0.55;
+  }
+  .mob-conn-dot.g { background: #b06000; }
+  .mob-conn-dot.e { background: #1e4f8a; }
+  .mob-conn-dot.v { background: #1a4a2e; }
+  .mob-conn-dot.active { opacity: 1; }
 
-  /* spine bullets still show */
-  .cell-inner::before { left: -5px !important; }
+  /* no spine bullets on mobile — replaced by mob-conn-dots */
+  .cell-inner::before { display: none !important; }
+  .band-cell::before  { display: none !important; }
 
-  /* make tip invisible on mobile — use drawer instead */
+  /* empty cells shown with placeholder */
+  .cell.empty.mob-show, .band-cell.empty.mob-show {
+    display: block;
+    padding: 8px 12px;
+  }
+  .mob-no-conn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; color: #b0aba3;
+    letter-spacing: .04em; font-style: italic;
+  }
   #tip { display: none !important; }
 }
 </style>
 </head>
 <body>
-<div class="tab-bar">
-  <button data-tab="G" class="active">Ghalibaf</button>
-  <button data-tab="E">Eje'i</button>
-  <button data-tab="V">Vahidi</button>
-</div>
 <div class="page">
 
 <div class="masthead">Iranian Power Network — Analysis</div>
 <div class="headline">
   <div class="kicker">Network Analysis · Islamic Republic Regime</div>
   <h1>The Architects of Continuity</h1>
-  <p class="deck">Structural mapping of the networks connecting Ghalibaf, Mohseni-Eje'i and Vahidi. The label column names each node; the three principal columns show what each figure's connection to it was. Hover for analysis.</p>
+  <p class="deck">Structural mapping of the networks connecting Ghalibaf, Mohseni-Eje'i and Vahidi. The label column names each node; the three principal columns show each figure's connection to it. Hover or tap any row for analysis.</p>
 </div>
 
 <div class="legend-wrap">
@@ -425,9 +468,16 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   </div>
 </div>
 
-<div class="hint"><div class="hint-icon">⌖</div><span>Hover any row for analysis</span></div>
+<div class="hint"><div class="hint-icon">⌖</div><span>Hover or tap any row for analysis</span></div>
 
 <div class="grid">
+
+<!-- tab bar — mobile only, lives inside grid so it scrolls with content then sticks -->
+<div class="tab-bar">
+  <button data-tab="G" class="active">Ghalibaf</button>
+  <button data-tab="E">Eje'i</button>
+  <button data-tab="V">Vahidi</button>
+</div>
 
 <!-- column headers -->
 <div class="col-heads">
@@ -939,36 +989,86 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 <div id="mob-drawer"></div>
 <script>
 (function() {
-  var tip = document.getElementById('tip');
+  var tip    = document.getElementById('tip');
   var drawer = document.getElementById('mob-drawer');
-  var overlay = document.getElementById('mob-drawer-overlay');
-  var isMobile = function() { return window.innerWidth <= 500; };
+  var overlay= document.getElementById('mob-drawer-overlay');
+  var isMob  = function(){ return window.innerWidth <= 500; };
 
-  // ── Tab switcher ──────────────────────────────────────────
+  // ── Inject mob-conn-dots into every .lbl and .band-lbl ─────
+  // After DOM ready, scan each row/band and work out which principals
+  // have non-empty cells, then inject colour dots into the label cell.
+  function injectConnDots() {
+    document.querySelectorAll('.row, .band').forEach(function(el) {
+      var lbl = el.querySelector('.lbl, .band-lbl');
+      if (!lbl) return;
+      var dots = document.createElement('div');
+      dots.className = 'mob-conn-dots';
+      ['g','e','v'].forEach(function(c) {
+        var cell = el.querySelector('.col-' + c);
+        if (!cell || cell.classList.contains('empty')) return; // skip empty
+        var dot = document.createElement('span');
+        dot.className = 'mob-conn-dot ' + c;
+        dot.dataset.col = c;
+        dots.appendChild(dot);
+      });
+      if (dots.children.length > 0) lbl.appendChild(dots);
+    });
+  }
+  injectConnDots();
+
+  // ── Adaptive hint text ───────────────────────────────────────
+  var hintEl = document.querySelector('.hint span');
+  if (hintEl) hintEl.textContent = 'Hover or tap any row for analysis';
+  var deckEl = document.querySelector('.deck');
+  if (deckEl) deckEl.textContent = 'Structural mapping of the networks connecting Ghalibaf, Mohseni-Eje\u2019i and Vahidi. The label column names each node; the three principal columns show each figure\u2019s connection to it. Hover or tap any row for analysis.';
+
+  // ── Tab switcher ────────────────────────────────────────────
   var activeTab = 'G';
   function applyTab(tab) {
     activeTab = tab;
-    // Update button states
     document.querySelectorAll('.tab-bar button').forEach(function(b) {
       b.classList.toggle('active', b.dataset.tab === tab);
     });
-    // Show/hide cells
+    var col = tab.toLowerCase();
     ['g','e','v'].forEach(function(c) {
-      var colId = c.toUpperCase();
-      document.querySelectorAll('.cell.col-' + c + ', .band-cell.col-' + c).forEach(function(el) {
-        el.classList.toggle('mob-show', colId === tab);
+      document.querySelectorAll('.cell.col-'+c+', .band-cell.col-'+c).forEach(function(el) {
+        el.classList.toggle('mob-show', c.toUpperCase() === tab);
       });
+    });
+    // Inject "no connection" placeholder into empty cells for the active tab
+    document.querySelectorAll('.cell.col-'+col+'.empty, .band-cell.col-'+col+'.empty').forEach(function(el) {
+      if (!el.querySelector('.mob-no-conn')) {
+        var span = document.createElement('span');
+        span.className = 'mob-no-conn';
+        span.textContent = 'No direct connection';
+        el.appendChild(span);
+      }
+      el.classList.add('mob-show');
+    });
+    // Update dot opacity
+    document.querySelectorAll('.mob-conn-dot').forEach(function(d) {
+      d.classList.toggle('active', d.dataset.col === col);
     });
   }
   document.querySelectorAll('.tab-bar button').forEach(function(btn) {
-    btn.addEventListener('click', function() { applyTab(btn.dataset.tab); });
+    btn.addEventListener('click', function(){ applyTab(btn.dataset.tab); });
   });
-  applyTab('G'); // init
+  applyTab('G');
 
-  // ── Drawer ────────────────────────────────────────────────
-  function showDrawer(html, accentCol) {
+  // ── Drawer ──────────────────────────────────────────────────
+  function buildHTML(el) {
+    var n = el.getAttribute('data-n');
+    var r = el.getAttribute('data-r');
+    var t = el.getAttribute('data-t');
+    if (!t) return null;
+    return (n ? '<strong>'+n+'</strong>' : '') + (r ? '<em>'+r+'</em>' : '') + t;
+  }
+  function accentFor(tab) {
+    return tab==='G' ? '#b06000' : tab==='E' ? '#1e4f8a' : '#1a4a2e';
+  }
+  function showDrawer(html, accent) {
     drawer.innerHTML = '<span id="mob-drawer-close">✕ close</span>' + html;
-    drawer.style.borderTopColor = accentCol || '#8b1a1a';
+    drawer.style.borderTopColor = accent || '#8b1a1a';
     drawer.style.display = 'block';
     overlay.style.display = 'block';
     document.getElementById('mob-drawer-close').addEventListener('click', closeDrawer);
@@ -978,58 +1078,43 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
     overlay.style.display = 'none';
   }
   overlay.addEventListener('click', closeDrawer);
-  document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeDrawer(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDrawer(); });
 
-  // ── Tooltip (desktop) ─────────────────────────────────────
+  // ── Tooltip (desktop) ───────────────────────────────────────
   function mv(e) {
-    var x = e.clientX + 14, y = e.clientY + 14;
-    var pw = 320, ph = tip.offsetHeight || 160;
-    if (x + pw > window.innerWidth - 8)  x = e.clientX - pw - 14;
-    if (y + ph > window.innerHeight - 8) y = e.clientY - ph - 14;
-    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    var x=e.clientX+14, y=e.clientY+14, pw=320, ph=tip.offsetHeight||160;
+    if (x+pw > window.innerWidth-8)  x=e.clientX-pw-14;
+    if (y+ph > window.innerHeight-8) y=e.clientY-ph-14;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
   }
 
-  function buildHTML(el) {
-    var n = el.getAttribute('data-n');
-    var r = el.getAttribute('data-r');
-    var t = el.getAttribute('data-t');
-    if (!t) return null;
-    return (n ? '<strong>' + n + '</strong>' : '') + (r ? '<em>' + r + '</em>' : '') + t;
-  }
-
-  function accentFor(el) {
-    if (el.classList.contains('col-g') || el.classList.contains('sec-orig') || el.classList.contains('sec-rep'))
-      return el.classList.contains('col-e') ? '#1e4f8a' : el.classList.contains('col-v') ? '#1a4a2e' : '#b06000';
-    return '#8b1a1a';
-  }
-
-  // ── Attach to all interactive rows/bands ─────────────────
+  // ── Attach interactions ─────────────────────────────────────
   document.querySelectorAll('.row[data-t], .band[data-t]').forEach(function(el) {
     // Desktop hover
     el.addEventListener('mouseenter', function(e) {
-      if (isMobile()) return;
-      var html = buildHTML(el); if (!html) return;
+      if (isMob()) return;
+      var html=buildHTML(el); if (!html) return;
       el.classList.add('active');
-      tip.innerHTML = html;
-      tip.style.display = 'block'; mv(e);
+      tip.innerHTML=html; tip.style.display='block'; mv(e);
     });
-    el.addEventListener('mousemove', function(e) { if (!isMobile()) mv(e); });
+    el.addEventListener('mousemove', function(e){ if (!isMob()) mv(e); });
     el.addEventListener('mouseleave', function() {
-      if (isMobile()) return;
-      el.classList.remove('active'); tip.style.display = 'none';
+      if (isMob()) return;
+      el.classList.remove('active'); tip.style.display='none';
     });
 
-    // Mobile tap — use touchend to avoid triggering on scroll
-    var touchStartY = 0;
-    el.addEventListener('touchstart', function(e) {
-      touchStartY = e.touches[0].clientY;
-    }, { passive: true });
+    // Mobile: tap via touchend with scroll-guard
+    var _touchStartY = 0;
+    el.addEventListener('touchstart', function(e){
+      _touchStartY = e.touches[0].clientY;
+    }, { passive:true });
     el.addEventListener('touchend', function(e) {
-      var dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
-      if (dy > 8) return; // was a scroll, not a tap
-      var html = buildHTML(el); if (!html) return;
+      if (!isMob()) return;
+      var dy = Math.abs(e.changedTouches[0].clientY - _touchStartY);
+      if (dy > 8) return; // scroll, not tap
+      var html=buildHTML(el); if (!html) return;
       e.preventDefault();
-      showDrawer(html, null);
+      showDrawer(html, accentFor(activeTab));
     });
   });
 
