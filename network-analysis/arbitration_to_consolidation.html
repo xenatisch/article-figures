@@ -4,7 +4,6 @@ Copyright (c) 2026 Pouria Hadjibagheri. All rights reserved.
 
 Interactive timeline figure showing the 2009–2026 consolidation of Iranian regime power and key elimination/repression/war events.
 -->
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -288,10 +287,15 @@ function draw() {
   ctx.font="400 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='top';
   ctx.fillText('2014 – 2019', bx, AXIS_Y+8); ctx.restore();
 
-  [2009,2010,2011,2012,2013,2014,2019,2020,2021,2022,2023,2024,2025,2026].forEach(y => {
+  const mobile = W < 500;
+  const tickYears = mobile
+    ? [2009,2011,2013,2014,2019,2020,2022,2024,2026]
+    : [2009,2010,2011,2012,2013,2014,2019,2020,2021,2022,2023,2024,2025,2026];
+
+  tickYears.forEach(y => {
     const x = xOf(y);
     ctx.beginPath(); ctx.moveTo(x,AXIS_Y-3); ctx.lineTo(x,AXIS_Y+3); ctx.strokeStyle=RULE; ctx.lineWidth=1; ctx.stroke();
-    ctx.font="400 8.5px 'IBM Plex Mono',monospace"; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.font=`400 ${mobile?7:8.5}px 'IBM Plex Mono',monospace`; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='bottom';
     ctx.fillText(y, x, AXIS_Y-6);
   });
 
@@ -323,7 +327,7 @@ function draw() {
         ctx.setLineDash([4,4]); ctx.beginPath(); ctx.roundRect(x1,yTop,bw,bh,2); ctx.stroke(); ctx.setLineDash([]);
       }
       ctx.restore();
-      if (role.solid) {
+      if (role.solid && !mobile) {
         ctx.save();
         ctx.font = "300 7.5px 'Source Sans 3',sans-serif";
         ctx.globalAlpha = 0.88;
@@ -364,35 +368,33 @@ function draw() {
     });
   });
 
-  // ── War events at top — text only, no pill ──
+  // ── War events at top — text only on desktop ──
   EVENTS.filter(e=>e.isWar).forEach(ev => {
     const x=ev._x, col=TYPE_COL.war, isActive=activeEvent===ev;
     ctx.save();
-    // dashed vertical line from label down to axis
     ctx.strokeStyle=col; ctx.lineWidth=isActive?1.5:0.9; ctx.globalAlpha=isActive?0.6:0.3;
     ctx.setLineDash([4,3]);
     ctx.beginPath(); ctx.moveTo(x, ev._warLabelY+12); ctx.lineTo(x, AXIS_Y); ctx.stroke();
     ctx.setLineDash([]);
-    // small horizontal tick
     ctx.lineWidth=isActive?2:1.2; ctx.globalAlpha=isActive?0.75:0.4;
     ctx.beginPath(); ctx.moveTo(x-5, ev._warLabelY+12); ctx.lineTo(x+5, ev._warLabelY+12); ctx.stroke();
-    // label text
-    ctx.globalAlpha=isActive?1:0.76;
-    ctx.font=`${isActive?600:500} 8px 'Source Sans 3',sans-serif`;
-    ctx.fillStyle=col; ctx.textAlign=ev._warAlign; ctx.textBaseline='alphabetic';
-    // split title at space nearest midpoint for two-line rendering
-    const titleWords = ev.title.split(' ');
-    const mid = Math.ceil(titleWords.length / 2);
-    const line1 = titleWords.slice(0, mid).join(' ');
-    const line2 = titleWords.slice(mid).join(' ');
-    if (line2) {
-      ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 5);
-      ctx.fillText(line2, ev._warLabelX, ev._warLabelY + 5 + 10);
-    } else {
-      ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 12);
+    if (!mobile) {
+      ctx.globalAlpha=isActive?1:0.76;
+      ctx.font=`${isActive?600:500} 8px 'Source Sans 3',sans-serif`;
+      ctx.fillStyle=col; ctx.textAlign=ev._warAlign; ctx.textBaseline='alphabetic';
+      const titleWords = ev.title.split(' ');
+      const mid = Math.ceil(titleWords.length / 2);
+      const line1 = titleWords.slice(0, mid).join(' ');
+      const line2 = titleWords.slice(mid).join(' ');
+      if (line2) {
+        ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 5);
+        ctx.fillText(line2, ev._warLabelX, ev._warLabelY + 5 + 10);
+      } else {
+        ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 12);
+      }
+      ctx.font=`300 7px 'IBM Plex Mono',monospace`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
+      ctx.fillText(ev.sub.split('—')[0].trim(), ev._warLabelX, ev._warLabelY + (line2 ? 28 : 21));
     }
-    ctx.font=`300 7px 'IBM Plex Mono',monospace`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
-    ctx.fillText(ev.sub.split('—')[0].trim(), ev._warLabelX, ev._warLabelY + (line2 ? 28 : 21));
     ctx.restore();
   });
 
@@ -413,8 +415,8 @@ function draw() {
     ctx.restore();
   });
 
-  // ── Cluster: connector lines dot → label ──
-  EVENTS.filter(e=>e.cluster).forEach(ev => {
+  // ── Cluster: connector lines dot → label (desktop only) ──
+  if (!mobile) EVENTS.filter(e=>e.cluster).forEach(ev => {
     const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
     ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=0.6; ctx.globalAlpha=isActive?0.45:0.18;
     ctx.setLineDash([2,3]);
@@ -425,8 +427,8 @@ function draw() {
     ctx.stroke(); ctx.setLineDash([]); ctx.restore();
   });
 
-  // ── Standard: label connector lines if level>0 ──
-  EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
+  // ── Standard: label connector lines if level>0 (desktop only) ──
+  if (!mobile) EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
     if ((ev._lblLvl||0) === 0) return;
     const x=ev._x, col=TYPE_COL[ev.type], isActive=activeEvent===ev;
     const dotR=5, isUp=ev._lblDir==='up';
@@ -444,7 +446,8 @@ function draw() {
   dotEvents.forEach(ev => {
     const x  = ev.cluster ? ev._dotX : ev._x;
     const y  = ev.cluster ? ev._dotY : EVT_DOT_Y;
-    const col= TYPE_COL[ev.type], isActive=activeEvent===ev, dotR=isActive?7:5;
+    const col= TYPE_COL[ev.type], isActive=activeEvent===ev;
+    const dotR = isActive ? (mobile?10:7) : (mobile?7:5);
     ctx.save(); ctx.globalAlpha=isActive?1:0.82;
     ctx.beginPath(); ctx.arc(x,y,dotR,0,Math.PI*2);
     ctx.fillStyle=col; ctx.fill();
@@ -457,8 +460,8 @@ function draw() {
     ctx.restore();
   });
 
-  // ── Standard event labels ──
-  EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
+  // ── Standard event labels (desktop only) ──
+  if (!mobile) EVENTS.filter(e=>!e.isWar&&!e.cluster).forEach(ev => {
     const x=ev._x, col=TYPE_COL[ev.type], isActive=activeEvent===ev;
     const dotR=5, isUp=ev._lblDir==='up', lvl=ev._lblLvl||0;
     const lvlOff=dotR+6+lvl*LBL_LEVEL_H;
@@ -471,8 +474,8 @@ function draw() {
     ctx.restore();
   });
 
-  // ── Cluster event labels ──
-  EVENTS.filter(e=>e.cluster).forEach(ev => {
+  // ── Cluster event labels (desktop only) ──
+  if (!mobile) EVENTS.filter(e=>e.cluster).forEach(ev => {
     const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
     ctx.save(); ctx.globalAlpha=isActive?1:0.75;
     ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
@@ -482,23 +485,30 @@ function draw() {
   });
 
   // ── Legend ──
-  const legY = H - 30;
-  const legItems = [
-    { col:TYPE_COL.eliminated, label:'Eliminated ✕' },
-    { col:TYPE_COL.repression, label:'Repression event' },
-    { col:TYPE_COL.war,        label:'War' },
-    { col:TYPE_COL.milestone,  label:'Power milestone' },
-  ];
+  const legY = H - (mobile ? 22 : 30);
+  const legItems = mobile
+    ? [ { col:TYPE_COL.eliminated, label:'Killed' }, { col:TYPE_COL.repression, label:'Repression' }, { col:TYPE_COL.war, label:'War' }, { col:TYPE_COL.milestone, label:'Milestone' } ]
+    : [ { col:TYPE_COL.eliminated, label:'Eliminated ✕' }, { col:TYPE_COL.repression, label:'Repression event' }, { col:TYPE_COL.war, label:'War' }, { col:TYPE_COL.milestone, label:'Power milestone' } ];
   let lx = TL_LEFT;
+  const legFontSize = mobile ? 7.5 : 9;
+  ctx.font=`300 ${legFontSize}px 'Source Sans 3',sans-serif`;
   legItems.forEach(it => {
-    ctx.beginPath(); ctx.arc(lx+5, legY, 4.5, 0, Math.PI*2);
+    ctx.beginPath(); ctx.arc(lx+4, legY, mobile?3.5:4.5, 0, Math.PI*2);
     ctx.fillStyle=it.col; ctx.fill();
-    ctx.font="300 9px 'Source Sans 3',sans-serif";
     ctx.fillStyle=MUTED; ctx.textAlign='left'; ctx.textBaseline='middle';
-    ctx.fillText(it.label, lx+14, legY);
-    lx += ctx.measureText(it.label).width + 30;
+    ctx.fillText(it.label, lx+12, legY);
+    lx += ctx.measureText(it.label).width + (mobile?16:30);
   });
 
+  // Mobile: "tap dots" hint
+  if (mobile) {
+    ctx.save();
+    ctx.font="300 7px 'IBM Plex Mono',monospace";
+    ctx.fillStyle='rgba(154,151,149,0.7)';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('TAP ANY DOT FOR ANALYSIS', W/2, EVT_DOT_Y - 14);
+    ctx.restore();
+  }
 }
 
 // Override wrapText for cluster labels (right-aligned, multi-line from centre)
