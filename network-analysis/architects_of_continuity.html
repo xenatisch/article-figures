@@ -132,7 +132,25 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   position: relative;
 }
 .cell:last-child { }
-.cell.empty { cursor: default; }
+.cell.empty {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  padding: 10px 13px 10px 17px;
+}
+.band-cell.empty {
+  display: flex;
+  align-items: center;
+}
+.cell.empty::after,
+.band-cell.empty::after {
+  content: 'No direct connection';
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .04em;
+  color: #b0aba3;
+  font-style: italic;
+}
 .cell:not(.empty):hover { filter: brightness(.95); }
 .cell.active { filter: brightness(.92); }
 
@@ -447,13 +465,9 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 
   /* empty cells shown with placeholder */
   .cell.empty.mob-show, .band-cell.empty.mob-show {
-    display: block;
+    display: flex;
+    align-items: center;
     padding: 8px 12px;
-  }
-  .mob-no-conn {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px; color: #b0aba3;
-    letter-spacing: .04em; font-style: italic;
   }
   #tip { display: none !important; }
 }
@@ -1049,16 +1063,6 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
       document.querySelectorAll('.cell.col-'+c+', .band-cell.col-'+c).forEach(function(el) {
         el.classList.toggle('mob-show', c.toUpperCase() === tab);
       });
-    });
-    // Inject "no connection" placeholder into empty cells for the active tab
-    document.querySelectorAll('.cell.col-'+col+'.empty, .band-cell.col-'+col+'.empty').forEach(function(el) {
-      if (!el.querySelector('.mob-no-conn')) {
-        var span = document.createElement('span');
-        span.className = 'mob-no-conn';
-        span.textContent = 'No direct connection';
-        el.appendChild(span);
-      }
-      el.classList.add('mob-show');
     });
     // Update dot opacity
     document.querySelectorAll('.mob-conn-dot').forEach(function(d) {
