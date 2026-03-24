@@ -192,7 +192,7 @@ function computeLayout() {
 
   // Margins
   TL_LEFT  = mobile ? 58 : Math.round(W * 0.145);  // wider left margin for long names
-  TL_RIGHT = mobile ? W - 20 : W - 30;
+  TL_RIGHT = mobile ? W - 20 : W - 46;
   TL_W     = TL_RIGHT - TL_LEFT;
 
   // Vertical anchors — fixed pixel values on mobile, proportional on desktop
@@ -381,11 +381,8 @@ function draw() {
           while (ctx.measureText(lbl).width > bw-6 && lbl.length > 5) lbl = lbl.slice(0,-4)+'…';
           ctx.fillText(lbl, x1+bw/2, yTop+bh/2);
         } else {
-          // bar too narrow — label outside; flip side near chart edges
-          const edgePad = 60;
-          const spaceLeft = x1 - TL_LEFT;
-          const spaceRight = TL_RIGHT - x2;
-          const goLeft = spaceRight < edgePad ? true : (spaceLeft < edgePad ? false : false);
+          // bar too narrow — label outside; left side only when bar starts near left edge
+          const goLeft = x1 < TL_LEFT + 60;
           ctx.fillStyle = p.col;
           ctx.textAlign = goLeft ? 'right' : 'left';
           ctx.textBaseline = 'middle';
