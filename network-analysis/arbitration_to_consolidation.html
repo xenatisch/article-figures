@@ -77,6 +77,7 @@ const TYPE_COL = {
   milestone:  '#3a3835',
   war:        '#2a5070',
 };
+const MOJTABA_INSTALL_YEAR = 2026.35;
 
 // ── Principal role data (year-based, position-independent) ────
 const LANE_TOP_FRAC = 0.139; // fraction of H
@@ -94,7 +95,7 @@ const PRINCIPALS = [
     { from:2014,   to:2021,    label:'Dep. Judiciary head',  row:0, solid:true  },
     { from:2021,   to:2026.6,  label:'Judiciary Chief',      row:0, solid:true  },
     { from:2021,   to:2026.6,  label:'SNSC Member',          row:1, solid:true  },
-    { from:2026.08,to:2026.6,  label:'Interim Council',      row:2, solid:true  },
+    { from:2026.08,to:MOJTABA_INSTALL_YEAR, label:'Interim Council', row:2, solid:true  },
   ]},
   { id:'V', label:'Vahidi', col:CV, roles:[
     { from:2009,   to:2013,   label:'Defence Minister',      row:0, solid:true  },
@@ -146,7 +147,7 @@ const EVENTS = [
     title:'Larijani killed',
     sub:'17 March 2026 — Israeli strike',
     body:"The last mediator gone. Larijani translated hardline positions into language Western foreign ministers could engage with. That service is now gone entirely." },
-  { year:2026.35, type:'milestone', cluster:true, dotYOff:66,
+  { year:MOJTABA_INSTALL_YEAR, type:'milestone', cluster:true, dotYOff:66,
     title:'Mojtaba Khamenei installed',
     sub:'March 2026',
     body:"Ghalibaf, Vahidi and Taeb as principal campaigners. Eje'i holds sovereign authority on the Interim Leadership Council. A cartel installing a controllable placeholder while real power sits one step removed." },
