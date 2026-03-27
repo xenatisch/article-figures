@@ -36,19 +36,25 @@ canvas{display:block;width:100%;cursor:default}
 #detail-panel{
   display:none;
   position:absolute;
-  bottom:100%;
-  left:0; right:0;
+  top:8px;
+  left:0;
+  right:0;
+  width:auto;
+  margin:0;
   background:#1a1814;
   border-top:1px solid #333;
   border-left:4px solid #8b1a1a;
   padding:14px 18px 16px;
   font-family:'Noto Serif',serif;
-  z-index:10;
+  max-height:min(42vh, calc(100vh - 18px));
+  overflow-y:auto;
+  box-shadow:0 8px 28px rgba(0,0,0,.45);
+  z-index:20;
 }
 #detail-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px}
 #detail-sub{font-size:8.5px;font-family:'Noto Sans',sans-serif;color:#888;letter-spacing:.04em;margin-bottom:10px}
 #detail-body{font-size:11px;font-weight:300;color:#c8c4bc;line-height:1.65;max-width:620px}
-#detail-close{position:absolute;top:10px;right:14px;font-size:11px;color:#666;cursor:pointer;font-family:'Noto Sans',sans-serif;letter-spacing:.05em}
+#detail-close{position:sticky;top:0;float:right;background:#1a1814;padding:2px 0 6px 10px;z-index:1;font-size:11px;color:#666;cursor:pointer;font-family:'Noto Sans',sans-serif;letter-spacing:.05em}
 #detail-close:hover{color:#aaa}
 #tip{display:none}
 
@@ -809,13 +815,14 @@ canvas.addEventListener('mousemove', ev => {
   const rect=canvas.getBoundingClientRect();
   const mx=(ev.clientX-rect.left)*(W/rect.width);
   const my=(ev.clientY-rect.top)*(H/rect.height);
+  const isMobileView = W < 420;
   let hit=null;
   EVENTS.forEach(e => {
     if (e.isWar) {
       const onStem = Math.abs(mx-e._x)<12 && my>=e._warLabelY && my<=AXIS_Y;
       const warLeft = (e._warAlign === 'right') ? (e._warLabelX - (e._warMaxW || 0)) : e._warLabelX;
       const warRight = (e._warAlign === 'right') ? e._warLabelX : (e._warLabelX + (e._warMaxW || 0));
-      const onLabel = (mobile && e._warMaxW)
+      const onLabel = (isMobileView && e._warMaxW)
         ? (mx>=warLeft && mx<=warRight && my>=e._warLabelY && my<=AXIS_Y-6)
         : false;
       if (onStem || onLabel) hit=e;
@@ -840,13 +847,14 @@ canvas.addEventListener('touchstart', ev => {
   const t=ev.touches[0];
   const mx=(t.clientX-rect.left)*(W/rect.width);
   const my=(t.clientY-rect.top)*(H/rect.height);
+  const isMobileView = W < 420;
   let hit=null;
   EVENTS.forEach(e => {
     if (e.isWar) {
       const onStem = Math.abs(mx-e._x)<18 && my>=e._warLabelY && my<=AXIS_Y;
       const warLeft = (e._warAlign === 'right') ? (e._warLabelX - (e._warMaxW || 0)) : e._warLabelX;
       const warRight = (e._warAlign === 'right') ? e._warLabelX : (e._warLabelX + (e._warMaxW || 0));
-      const onLabel = (mobile && e._warMaxW)
+      const onLabel = (isMobileView && e._warMaxW)
         ? (mx>=warLeft-4 && mx<=warRight+4 && my>=e._warLabelY-2 && my<=AXIS_Y-4)
         : false;
       if (onStem || onLabel) hit=e;

@@ -339,7 +339,9 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 .band.sec-orig .band-cell.col-v::before { background: #1a4a2e; box-shadow: 0 0 0 2.5px #eef3f8; }
 
 /* tooltip */
-#tip { position: fixed; z-index: 9999; width: 320px; background: #1a1814; color: #f0ece3; border-radius: 3px; padding: 13px 15px; font-size: 11.5px; line-height: 1.68; font-weight: 300; pointer-events: none; box-shadow: 0 6px 28px rgba(0,0,0,.55); display: none; font-family: 'Noto Serif',serif; }
+#tip { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 9999; width: min(760px, calc(100vw - 20px)); background: #1a1814; color: #f0ece3; border-radius: 3px; padding: 13px 15px; font-size: 11.5px; line-height: 1.68; font-weight: 300; pointer-events: auto; box-shadow: 0 6px 28px rgba(0,0,0,.55); display: none; font-family: 'Noto Serif',serif; max-height: min(46vh, calc(100vh - 20px)); overflow-y: auto; }
+#tip-close { position: sticky; top: 0; float: right; background: #1a1814; color: #888; cursor: pointer; font-family: 'Noto Sans',sans-serif; font-size: 10px; letter-spacing: .05em; text-transform: uppercase; padding: 2px 0 6px 10px; z-index: 1; }
+#tip-close:hover { color: #b8b3aa; }
 #tip strong { font-weight: 600; font-size: 13px; display: block; margin-bottom: 5px; color: #fff; }
 #tip em { font-style: normal; font-family: 'Noto Sans',sans-serif; font-size: 8.5px; color: #888; display: block; margin-bottom: 8px; letter-spacing: .05em; }
 
@@ -1077,6 +1079,12 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   var drawer = document.getElementById('mob-drawer');
   var overlay= document.getElementById('mob-drawer-overlay');
   var isMob  = function(){ return window.innerWidth <= 500; };
+  var pinnedEl = null;
+  var pageEl = document.querySelector('.page');
+  var gridEl = document.querySelector('.grid');
+  if (pageEl && gridEl && tip && tip.parentNode !== pageEl) {
+    pageEl.insertBefore(tip, gridEl);
+  }
 
   // ── Inject mob-conn-dots into every .lbl and .band-lbl ─────
   // After DOM ready, scan each row/band and work out which principals
@@ -1154,12 +1162,30 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   overlay.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDrawer(); });
 
-  // ── Tooltip (desktop) ───────────────────────────────────────
-  function mv(e) {
-    var x=e.clientX+14, y=e.clientY+14, pw=320, ph=tip.offsetHeight||160;
-    if (x+pw > window.innerWidth-8)  x=e.clientX-pw-14;
-    if (y+ph > window.innerHeight-8) y=e.clientY-ph-14;
-    tip.style.left=x+'px'; tip.style.top=y+'px';
+  // ── Fixed detail panel (desktop / tablet) ───────────────────
+  function showFixedTip(el) {
+    var html = buildHTML(el); if (!html) return;
+    document.querySelectorAll('.row.active, .band.active').forEach(function(a){
+      if (a !== el) a.classList.remove('active');
+    });
+    el.classList.add('active');
+    tip.innerHTML = '<span id="tip-close">ESC ✕</span>' + html;
+    var tipClose = document.getElementById('tip-close');
+    if (tipClose) {
+      tipClose.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        clearFixedTip();
+      });
+    }
+    tip.style.display = 'block';
+  }
+  function clearFixedTip() {
+    pinnedEl = null;
+    document.querySelectorAll('.row.active, .band.active').forEach(function(a){
+      a.classList.remove('active');
+    });
+    tip.style.display = 'none';
   }
 
   // ── Attach interactions ─────────────────────────────────────
@@ -1167,14 +1193,18 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
     // Desktop hover
     el.addEventListener('mouseenter', function(e) {
       if (isMob()) return;
-      var html=buildHTML(el); if (!html) return;
-      el.classList.add('active');
-      tip.innerHTML=html; tip.style.display='block'; mv(e);
+      if (pinnedEl && pinnedEl !== el) return;
+      showFixedTip(el);
     });
-    el.addEventListener('mousemove', function(e){ if (!isMob()) mv(e); });
-    el.addEventListener('mouseleave', function() {
+    el.addEventListener('click', function(e){
       if (isMob()) return;
-      el.classList.remove('active'); tip.style.display='none';
+      e.preventDefault();
+      pinnedEl = el;
+      showFixedTip(el);
+    });
+    el.addEventListener('mouseleave', function() {
+      if (isMob() || pinnedEl) return;
+      // Keep last hovered analysis visible to avoid flicker when the panel overlaps top rows.
     });
 
     // Mobile: tap via touchend with scroll-guard
@@ -1190,6 +1220,18 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
       e.preventDefault();
       showDrawer(html, accentFor(activeTab));
     });
+  });
+
+  // Desktop/tablet: click outside a pinned row to close fixed panel.
+  document.addEventListener('click', function(e){
+    if (isMob() || tip.style.display === 'none') return;
+    var inTarget = e.target && e.target.closest('.row[data-t], .band[data-t]');
+    var inTip = e.target && e.target.closest('#tip');
+    if (!inTarget && !inTip) clearFixedTip();
+  });
+  document.addEventListener('keydown', function(e){
+    if (isMob()) return;
+    if (e.key === 'Escape') clearFixedTip();
   });
 
 })();
