@@ -63,6 +63,19 @@ canvas{display:block;width:100%;cursor:default}
   .print-link{position:static;display:inline-block;margin:8px 0 10px}
 }
 
+@media (max-width: 1024px){
+  #detail-panel{
+    position:fixed;
+    top:auto;
+    bottom:10px;
+    left:10px;
+    right:10px;
+    width:auto;
+    max-height:min(52vh, calc(100vh - 20px));
+    z-index:999;
+  }
+}
+
 @page{size:A4 landscape;margin:1cm}
 
 @media print{
@@ -313,10 +326,16 @@ function computeLayout() {
   const fanB = Math.round(clusterDotX - W * (mobile ? 0.30 : 0.32));
   const CLUSTER_LBL_ROW_H = mobile ? 28 : (printMode ? 26 : 30);
   const clusterLblBaseY = mobile ? 16 : (printMode ? 34 : 22);
+  const mobileClusterBaseY = EVT_DOT_Y + 2;
+  const mobileClusterStep = 30;
 
   EVENTS.filter(e=>e.cluster).forEach((e, i) => {
     e._dotX = e._x;
-    e._dotY = EVT_DOT_Y + Math.round(e.dotYOff * (mobile ? 0.64 : 1));
+    // Mobile: use larger fixed vertical spacing so the final cluster dots
+    // are independently tappable.
+    e._dotY = mobile
+      ? (mobileClusterBaseY + i * mobileClusterStep)
+      : (EVT_DOT_Y + Math.round(e.dotYOff));
     e._lblX = i % 2 === 0 ? fanA : fanB;
     e._lblY = EVT_DOT_Y + i * CLUSTER_LBL_ROW_H + clusterLblBaseY;
   });
@@ -794,6 +813,29 @@ const panelTitle = document.getElementById('detail-title');
 const panelSub   = document.getElementById('detail-sub');
 const panelBody  = document.getElementById('detail-body');
 const panelClose = document.getElementById('detail-close');
+let pinnedEvent  = null;
+
+function detectHit(mx, my, isMobileView, forTouch) {
+  let hit = null;
+  const warTol = forTouch ? 18 : 12;
+  const stdTol = forTouch ? 16 : 10;
+  EVENTS.forEach(e => {
+    if (e.isWar) {
+      const onStem = Math.abs(mx-e._x) < warTol && my >= e._warLabelY && my <= AXIS_Y;
+      const warLeft = (e._warAlign === 'right') ? (e._warLabelX - (e._warMaxW || 0)) : e._warLabelX;
+      const warRight = (e._warAlign === 'right') ? e._warLabelX : (e._warLabelX + (e._warMaxW || 0));
+      const onLabel = (isMobileView && e._warMaxW)
+        ? (mx >= (warLeft - (forTouch ? 4 : 0)) && mx <= (warRight + (forTouch ? 4 : 0)) && my >= e._warLabelY - (forTouch ? 2 : 0) && my <= AXIS_Y - (forTouch ? 4 : 6))
+        : false;
+      if (onStem || onLabel) hit = e;
+    } else if (e.cluster) {
+      if (Math.hypot(mx-e._dotX, my-e._dotY) < stdTol) hit = e;
+    } else {
+      if (Math.hypot(mx-e._x, my-EVT_DOT_Y) < stdTol) hit = e;
+    }
+  });
+  return hit;
+}
 
 function showPanel(ev) {
   panelTitle.textContent = ev.title;
@@ -802,9 +844,10 @@ function showPanel(ev) {
   panel.style.borderLeftColor = TYPE_COL[ev.type];
   panel.style.display = 'block';
 }
-function hidePanel() {
+function hidePanel(clearPinned = true) {
   panel.style.display = 'none';
   activeEvent = null;
+  if (clearPinned) pinnedEvent = null;
   draw();
 }
 
@@ -816,28 +859,35 @@ canvas.addEventListener('mousemove', ev => {
   const mx=(ev.clientX-rect.left)*(W/rect.width);
   const my=(ev.clientY-rect.top)*(H/rect.height);
   const isMobileView = W < 420;
-  let hit=null;
-  EVENTS.forEach(e => {
-    if (e.isWar) {
-      const onStem = Math.abs(mx-e._x)<12 && my>=e._warLabelY && my<=AXIS_Y;
-      const warLeft = (e._warAlign === 'right') ? (e._warLabelX - (e._warMaxW || 0)) : e._warLabelX;
-      const warRight = (e._warAlign === 'right') ? e._warLabelX : (e._warLabelX + (e._warMaxW || 0));
-      const onLabel = (isMobileView && e._warMaxW)
-        ? (mx>=warLeft && mx<=warRight && my>=e._warLabelY && my<=AXIS_Y-6)
-        : false;
-      if (onStem || onLabel) hit=e;
-    } else if (e.cluster) {
-      if (Math.hypot(mx-e._dotX, my-e._dotY)<10) hit=e;
-    } else {
-      if (Math.hypot(mx-e._x, my-EVT_DOT_Y)<10) hit=e;
-    }
-  });
-  if (hit!==activeEvent) {
-    activeEvent=hit;
-    draw();
-    if (hit) showPanel(hit); else hidePanel();
+  const hit = detectHit(mx, my, isMobileView, false);
+  if (!isMobileView && pinnedEvent) {
+    canvas.style.cursor = hit ? 'pointer' : 'default';
+    return;
   }
-  canvas.style.cursor = hit?'pointer':'default';
+  if (hit !== activeEvent) {
+    activeEvent = hit;
+    draw();
+  }
+  if (hit) showPanel(hit);
+  else panel.style.display = 'none';
+  canvas.style.cursor = hit ? 'pointer' : 'default';
+});
+
+canvas.addEventListener('click', ev => {
+  const isMobileView = W < 420;
+  if (isMobileView) return;
+  const rect=canvas.getBoundingClientRect();
+  const mx=(ev.clientX-rect.left)*(W/rect.width);
+  const my=(ev.clientY-rect.top)*(H/rect.height);
+  const hit = detectHit(mx, my, false, false);
+  if (hit) {
+    pinnedEvent = hit;
+    activeEvent = hit;
+    draw();
+    showPanel(hit);
+  } else if (pinnedEvent) {
+    hidePanel(true);
+  }
 });
 
 // Touch support
@@ -848,26 +898,31 @@ canvas.addEventListener('touchstart', ev => {
   const mx=(t.clientX-rect.left)*(W/rect.width);
   const my=(t.clientY-rect.top)*(H/rect.height);
   const isMobileView = W < 420;
-  let hit=null;
-  EVENTS.forEach(e => {
-    if (e.isWar) {
-      const onStem = Math.abs(mx-e._x)<18 && my>=e._warLabelY && my<=AXIS_Y;
-      const warLeft = (e._warAlign === 'right') ? (e._warLabelX - (e._warMaxW || 0)) : e._warLabelX;
-      const warRight = (e._warAlign === 'right') ? e._warLabelX : (e._warLabelX + (e._warMaxW || 0));
-      const onLabel = (isMobileView && e._warMaxW)
-        ? (mx>=warLeft-4 && mx<=warRight+4 && my>=e._warLabelY-2 && my<=AXIS_Y-4)
-        : false;
-      if (onStem || onLabel) hit=e;
-    } else if (e.cluster) {
-      if (Math.hypot(mx-e._dotX, my-e._dotY)<16) hit=e;
-    } else {
-      if (Math.hypot(mx-e._x, my-EVT_DOT_Y)<16) hit=e;
-    }
-  });
-  if (hit) { activeEvent=hit; draw(); showPanel(hit); }
+  const hit = detectHit(mx, my, isMobileView, true);
+  if (hit) {
+    pinnedEvent = hit;
+    activeEvent = hit;
+    draw();
+    showPanel(hit);
+  }
 }, { passive:false });
 
-canvas.addEventListener('mouseleave',()=>{ canvas.style.cursor='default'; });
+canvas.addEventListener('mouseleave',()=>{
+  canvas.style.cursor='default';
+  if (W < 420 || pinnedEvent) return;
+  if (activeEvent || panel.style.display !== 'none') {
+    activeEvent = null;
+    panel.style.display = 'none';
+    draw();
+  }
+});
+
+document.addEventListener('click', ev => {
+  if (W < 420 || !pinnedEvent) return;
+  const inPanel = ev.target && ev.target.closest('#detail-panel');
+  const inCanvas = ev.target === canvas;
+  if (!inPanel && !inCanvas) hidePanel(true);
+});
 
 // Resize handler
 let resizeTimer;

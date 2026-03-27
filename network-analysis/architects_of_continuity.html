@@ -345,6 +345,14 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 #tip strong { font-weight: 600; font-size: 13px; display: block; margin-bottom: 5px; color: #fff; }
 #tip em { font-style: normal; font-family: 'Noto Sans',sans-serif; font-size: 8.5px; color: #888; display: block; margin-bottom: 8px; letter-spacing: .05em; }
 
+@media (min-width: 501px) and (max-width: 1024px) {
+  #tip {
+    top: auto;
+    bottom: 10px;
+    max-height: min(52vh, calc(100vh - 20px));
+  }
+}
+
 /* ── MOBILE TAB SWITCHER ── */
 /* Tab bar — fixed on mobile so it sticks throughout entire scroll */
 .tab-bar {
@@ -1221,6 +1229,15 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
       showDrawer(html, accentFor(activeTab));
     });
   });
+
+  // Desktop/tablet: if panel is hover-driven (not pinned), hide it when
+  // cursor leaves the graphic area.
+  if (gridEl) {
+    gridEl.addEventListener('mouseleave', function() {
+      if (isMob() || pinnedEl) return;
+      clearFixedTip();
+    });
+  }
 
   // Desktop/tablet: click outside a pinned row to close fixed panel.
   document.addEventListener('click', function(e){
