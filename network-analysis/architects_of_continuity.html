@@ -12,14 +12,24 @@ Interactive comparison figure mapping the three principal actors across origins,
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #f7f4ee; font-family: 'Source Sans 3', sans-serif; color: #1a1814; font-size: 15px; }
+:root {
+  --nw-paper: #f7f4ee;
+  --nw-ink: #1a1814;
+  --nw-rule: #c0bbb2;
+  --nw-accent: #8b1a1a;
+  --nw-muted: #6f6a62;
+}
+body { background: var(--nw-paper); font-family: 'Source Sans 3', sans-serif; color: var(--nw-ink); font-size: 15px; }
 .page { max-width: 800px; margin: 0 auto; padding: 0 24px 60px; }
 
-.masthead { border-top: 2.5px solid #1a1814; border-bottom: 1px solid #c0bbb2; padding: 7px 0 6px; margin-bottom: 4px; font-family: 'Playfair Display', serif; font-size: 10px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
-.headline { padding: 18px 0 15px; border-bottom: 1px solid #c0bbb2; margin-bottom: 20px; }
-.kicker { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: #8b1a1a; margin-bottom: 6px; }
+.masthead { border-top: 2.5px solid var(--nw-ink); border-bottom: 1px solid var(--nw-rule); padding: 7px 0 6px; margin-bottom: 4px; font-family: 'Playfair Display', serif; font-size: 10px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+.headline { position: relative; padding: 18px 140px 15px 0; border-bottom: 1px solid var(--nw-rule); margin-bottom: 20px; }
+.kicker { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: var(--nw-accent); margin-bottom: 6px; }
 h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1.1; color: #000; margin-bottom: 10px; }
 .deck { font-size: 13.5px; font-weight: 300; line-height: 1.65; color: #3d3a34; max-width: 600px; }
+.asof-note { margin-top: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: .05em; color: var(--nw-muted); text-transform: uppercase; }
+.print-link { position: absolute; top: 0; right: 0; display: inline-block; margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: #6e6a63; text-decoration: none; border: 1px solid var(--nw-rule); padding: 4px 8px; border-radius: 2px; }
+.print-link:hover { color: var(--nw-ink); border-color: #8f897f; }
 
 .legend-wrap { margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #c0bbb2; }
 .legend-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
@@ -162,22 +172,20 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 .row.sec-orig .cell.col-g,
 .row.sec-int  .cell.col-g,
 .row.sec-inst .cell.col-g,
-.row.sec-succ .cell.col-g  { border-left: 3px solid #b06000; }
+.row.sec-succ .cell.col-g,
+.row.sec-rep  .cell.col-g  { border-left: 3px solid #b06000; }
 
 .row.sec-orig .cell.col-e,
 .row.sec-int  .cell.col-e,
 .row.sec-inst .cell.col-e,
-.row.sec-succ .cell.col-e  { border-left: 3px solid #1e4f8a; }
+.row.sec-succ .cell.col-e,
+.row.sec-rep  .cell.col-e  { border-left: 3px solid #1e4f8a; }
 
 .row.sec-orig .cell.col-v,
 .row.sec-int  .cell.col-v,
 .row.sec-inst .cell.col-v,
-.row.sec-succ .cell.col-v  { border-left: 3px solid #1a4a2e; }
-
-/* Repression — red spine on all three columns */
-.row.sec-rep .cell.col-g,
-.row.sec-rep .cell.col-e,
-.row.sec-rep .cell.col-v   { border-left: 3px solid #8b1a1a; }
+.row.sec-succ .cell.col-v,
+.row.sec-rep  .cell.col-v  { border-left: 3px solid #1a4a2e; }
 
 /* cell content */
 .cell-inner { padding: 10px 13px 10px 17px; position: relative; min-height: 52px; }
@@ -195,27 +203,27 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 .row.sec-orig .cell.col-g:not(.empty) .cell-inner::before,
 .row.sec-int  .cell.col-g:not(.empty) .cell-inner::before,
 .row.sec-inst .cell.col-g:not(.empty) .cell-inner::before,
-.row.sec-succ .cell.col-g:not(.empty) .cell-inner::before
+.row.sec-succ .cell.col-g:not(.empty) .cell-inner::before,
+.row.sec-rep  .cell.col-g:not(.empty) .cell-inner::before
   { background: #b06000; box-shadow: 0 0 0 2.5px #f7f4ee; }
 
 .row.sec-orig .cell.col-e:not(.empty) .cell-inner::before,
 .row.sec-int  .cell.col-e:not(.empty) .cell-inner::before,
 .row.sec-inst .cell.col-e:not(.empty) .cell-inner::before,
-.row.sec-succ .cell.col-e:not(.empty) .cell-inner::before
+.row.sec-succ .cell.col-e:not(.empty) .cell-inner::before,
+.row.sec-rep  .cell.col-e:not(.empty) .cell-inner::before
   { background: #1e4f8a; box-shadow: 0 0 0 2.5px #f7f4ee; }
 
 .row.sec-orig .cell.col-v:not(.empty) .cell-inner::before,
 .row.sec-int  .cell.col-v:not(.empty) .cell-inner::before,
 .row.sec-inst .cell.col-v:not(.empty) .cell-inner::before,
-.row.sec-succ .cell.col-v:not(.empty) .cell-inner::before
+.row.sec-succ .cell.col-v:not(.empty) .cell-inner::before,
+.row.sec-rep  .cell.col-v:not(.empty) .cell-inner::before
   { background: #1a4a2e; box-shadow: 0 0 0 2.5px #f7f4ee; }
-
-/* repression red bullets */
-.row.sec-rep .cell:not(.empty) .cell-inner::before
-  { background: #8b1a1a; box-shadow: 0 0 0 2.5px #fdf0ef; }
 
 /* bullet background halo matches row bg */
 .row.bg-inst .cell:not(.empty) .cell-inner::before { box-shadow: 0 0 0 2.5px #eef3f8; }
+.row.bg-rep  .cell:not(.empty) .cell-inner::before { box-shadow: 0 0 0 2.5px #fdf0ef; }
 .row.bg-succ .cell:not(.empty) .cell-inner::before { box-shadow: 0 0 0 2.5px #f0eeff; }
 
 /* badges */
@@ -229,6 +237,7 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 .binf { background: #dedad4; color: #1a1814; }
 .bsucc{ background: #dedad4; color: #1a1814; }
 .bsanc{ background: #fff0cc; color: #5a3800; border: 1px solid #d4a030; }
+.badges .badge.bsanc { flex: 0 0 auto; width: max-content; margin-top: 2px; margin-right: 100%; }
 
 /* cell description text */
 .c-desc { font-size: 11.5px; font-weight: 400; color: #4a4844; display: block; line-height: 1.5; }
@@ -257,6 +266,7 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   overflow: hidden;
 }
 .band-name { font-size: 13px; font-weight: 600; color: #2a2824; display: block; line-height: 1.3; margin-bottom: 3px; }
+.band-name.kill { opacity: .62; }
 .band-sub  { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a776f; display: block; line-height: 1.4; }
 .band-kill { display: inline-flex; align-items: center; gap: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; color: #8b1a1a; margin-top: 4px; }
 .band-kill::before { content: '✕'; display: inline-flex; align-items: center; justify-content: center; width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid #8b1a1a; background: #f5dede; font-size: 6.5px; font-weight: 700; }
@@ -381,6 +391,11 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 #mob-drawer em { font-style:normal; font-family:'IBM Plex Mono',monospace; font-size:9px; color:#888; display:block; margin-bottom:10px; letter-spacing:.04em; }
 #mob-drawer-close { float:right; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#666; cursor:pointer; padding:2px 0 4px 8px; }
 
+@media (max-width: 860px) {
+  .headline { padding-right: 0; }
+  .print-link { position: static; display: inline-block; margin: 8px 0 10px; }
+}
+
 /* tablet: tighten label column */
 @media (min-width: 501px) and (max-width: 860px) {
   .page { padding: 0 16px 56px; }
@@ -471,6 +486,41 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   }
   #tip { display: none !important; }
 }
+
+@page { size: A4; margin: 1cm; }
+
+@media print {
+  body { background: #fff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .page { max-width: none; padding: 0 !important; }
+  .sec, .col-heads, .row, .band { break-inside: avoid-page !important; page-break-inside: avoid !important; }
+  .print-link, .hint, .tab-bar, #tip, #mob-drawer, #mob-drawer-overlay { display: none !important; }
+  .c-desc { display: none !important; }
+  .legend-wrap { margin-bottom: 10px !important; padding-bottom: 8px !important; }
+  .legend-row { gap: 10px !important; margin-bottom: 4px !important; }
+  .li { gap: 4px !important; font-size: 6pt !important; letter-spacing: .06em !important; }
+  .ldot { width: 7px !important; height: 7px !important; }
+  .swatch { width: 11px !important; height: 8px !important; }
+  .kill-leg { width: 11px !important; height: 11px !important; font-size: 6px !important; }
+  .grid .lbl-sub, .grid .band-sub { display: block !important; font-size: 5pt !important; line-height: 1.2 !important; color: #7a776f !important; }
+  .grid .ch-role { display: block !important; font-size: 7pt !important; line-height: 1.2 !important; }
+  .li, .ldot, .swatch, .kill-leg, .badge { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; forced-color-adjust: none !important; }
+  .dg { background: #b06000 !important; }
+  .de { background: #1e4f8a !important; }
+  .dv { background: #1a4a2e !important; }
+  .sw-inst { background: #eef3f8 !important; }
+  .sw-rep { background: #fdf0ef !important; }
+  .sw-succ { background: #f0eeff !important; }
+  .sw-plain { background: #f7f4ee !important; border-color: #c0bbb2 !important; }
+  .grid * { font-size: 7pt !important; line-height: 1.25 !important; }
+  .grid .sec-label, .grid .ch-name, .grid .lbl-name, .grid .band-name { font-size: 8pt !important; line-height: 1.2 !important; }
+  .cell, .band-cell { font-size: 0 !important; line-height: 0 !important; color: transparent !important; }
+  .badges { margin-bottom: 0 !important; }
+  .grid .badge, .grid .lbl-kill, .grid .band-kill { font-size: 6pt !important; line-height: 1.2 !important; font-weight: 400 !important; }
+  .grid .badge.bsanc { font-size: 5pt !important; }
+  .cell.empty::after, .band-cell.empty::after { display: none !important; content: none !important; }
+  .row:hover, .row.active, .band:hover, .band.active { filter: none !important; box-shadow: none !important; }
+  .col-heads { position: static; }
+}
 </style>
 </head>
 <body>
@@ -480,7 +530,9 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 <div class="headline">
   <div class="kicker">Network Analysis · Islamic Republic Regime</div>
   <h1>The Architects of Continuity</h1>
+  <a class="print-link" href="#" onclick="window.print(); return false;">Print-Friendly</a>
   <p class="deck">Structural mapping of the networks connecting Ghalibaf, Mohseni-Eje'i and Vahidi. The label column names each node; the three principal columns show each figure's connection to it. Hover or tap any row for analysis.</p>
+  <p class="asof-note">Data accurate as of March 2026</p>
 </div>
 
 <div class="legend-wrap">
@@ -513,7 +565,7 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 <!-- column headers -->
 <div class="col-heads">
   <div class="ch-label"></div>
-  <div class="ch cg"><span class="ch-name">Mohammad-Bagher Ghalibaf</span><span class="ch-role">Parliament Speaker · IRGC Brig. General</span><span class="ch-role" style="margin-top:3px"><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px">⚑ EU · US</span></span></div>
+  <div class="ch cg"><span class="ch-name">Mohammad-Bagher Ghalibaf</span><span class="ch-role">Parliament Speaker · Former IRGC Airforce Commander</span><span class="ch-role" style="margin-top:3px"><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px">⚑ EU · US</span></span></div>
   <div class="ch ce"><span class="ch-name">Gholam-Hossein Mohseni-Eje'i</span><span class="ch-role">Judiciary Chief · Interim Leadership Council</span><span class="ch-role" style="margin-top:3px"><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px">⚑ UK · EU · US</span></span></div>
   <div class="ch cv"><span class="ch-name">Ahmad Vahidi</span><span class="ch-role">IRGC Commander · Former Interior Minister</span><span class="ch-role" style="margin-top:3px"><span class="badge bsanc" style="font-size:7.5px;padding:1px 6px">⚑ EU · US · INTERPOL</span></span></div>
 </div>
@@ -726,7 +778,7 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   data-n="Ali Larijani"
   data-r="Parliament Speaker; SNSC Secretary · Killed 17 Mar 2026"
   data-t="Western governments spent years treating Larijani as someone you could do business with. A pragmatic conservative, they called him. He practically invented the genre of televised forced confessions — he ran state broadcasting in the 1990s. His function in the network was translation. He converted positions that, coming directly from Ghalibaf or Vahidi, would have been unacceptable, into language that European foreign ministers could pretend was a basis for negotiation. That service is now gone. The three remaining principals have no one left who can do that for them.">
-  <div class="band-lbl"><span class="band-name" style="color:#8b1a1a">Ali Larijani</span><span class="band-sub">Speaker; SNSC Secretary</span><span class="band-kill">Killed 17 Mar 2026</span></div>
+  <div class="band-lbl"><span class="band-name kill">Ali Larijani</span><span class="band-sub">Speaker; SNSC Secretary</span><span class="band-kill">Killed 17 Mar 2026</span></div>
   <div class="band-cell col-g">
     <div class="badges"><span class="badge bg">SNSC Co-Member</span><span class="badge bg">Factional Ally</span></div>
     SNSC co-member; factional ally in parliament; succession coordinator before his death

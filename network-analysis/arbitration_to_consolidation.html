@@ -10,16 +10,26 @@ Interactive timeline figure showing the 2009–2026 consolidation of Iranian reg
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Narrowing — Iranian Power Timeline</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:#f7f4ee;font-family:'Source Sans 3',sans-serif;color:#1a1814}
+:root{
+  --nw-paper:#f7f4ee;
+  --nw-ink:#1a1814;
+  --nw-rule:#c0bbb2;
+  --nw-accent:#8b1a1a;
+  --nw-muted:#6f6a62;
+}
+body{background:var(--nw-paper);font-family:'Source Sans 3',sans-serif;color:var(--nw-ink)}
 .page{max-width:800px;margin:0 auto;padding:0 24px 56px}
-.masthead{border-top:2.5px solid #1a1814;border-bottom:1px solid #c0bbb2;padding:7px 0 6px;margin-bottom:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase}
-.headline{padding:18px 0 15px;border-bottom:1px solid #c0bbb2;margin-bottom:28px}
-.kicker{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#8b1a1a;margin-bottom:6px}
-h1{font-size:26px;font-weight:600;line-height:1.15;color:#000;margin-bottom:10px}
-.deck{font-size:13px;font-weight:300;line-height:1.65;color:#3d3a34;max-width:580px}
+.masthead{border-top:2.5px solid var(--nw-ink);border-bottom:1px solid var(--nw-rule);padding:7px 0 6px;margin-bottom:4px;font-family:'Playfair Display',serif;font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
+.headline{position:relative;padding:18px 140px 15px 0;border-bottom:1px solid var(--nw-rule);margin-bottom:28px}
+.kicker{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--nw-accent);margin-bottom:6px}
+h1{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1.1;color:#000;margin-bottom:10px}
+.deck{font-size:13.5px;font-weight:300;line-height:1.65;color:#3d3a34;max-width:600px}
+.asof-note{margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.05em;color:var(--nw-muted);text-transform:uppercase}
+.print-link{position:absolute;top:0;right:0;display:inline-block;margin:0;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#6e6a63;text-decoration:none;border:1px solid var(--nw-rule);padding:4px 8px;border-radius:2px}
+.print-link:hover{color:var(--nw-ink);border-color:#8f897f}
 .canvas-wrap{position:relative}
 canvas{display:block;width:100%;cursor:default}
 .hover-hint{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9e9b95;margin:6px 0 0;text-align:center}
@@ -41,6 +51,28 @@ canvas{display:block;width:100%;cursor:default}
 #detail-close{position:absolute;top:10px;right:14px;font-size:11px;color:#666;cursor:pointer;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em}
 #detail-close:hover{color:#aaa}
 #tip{display:none}
+
+@media (max-width: 860px){
+  .headline{padding-right:0}
+  .print-link{position:static;display:inline-block;margin:8px 0 10px}
+}
+
+@page{size:A4 landscape;margin:1cm}
+
+@media print{
+  body{background:#fff}
+  .page{max-width:none;padding:0!important;break-inside:avoid-page;page-break-inside:avoid}
+  .masthead{font-size:9pt;letter-spacing:.16em;padding:3px 0 3px;margin-bottom:2px;font-weight:700}
+  .headline{padding:6px 100px 6px 0;margin-bottom:8px}
+  .kicker{font-size:7pt;letter-spacing:.14em;margin-bottom:3px;font-weight:400}
+  h1{font-size:13pt;line-height:1.1;margin-bottom:4px}
+  .deck{font-size:8pt;line-height:1.3;max-width:none}
+  .asof-note{font-size:7pt;margin-top:3px;font-weight:400}
+  .canvas-wrap{width:100%;display:flex;justify-content:center;align-items:flex-start;break-inside:avoid-page;page-break-inside:avoid}
+  canvas{display:block;max-width:100%!important;height:auto!important;max-height:none!important;margin:0 auto!important}
+  .print-link,.hover-hint,#detail-panel,#tip{display:none!important}
+  .canvas-wrap,canvas{background:transparent!important}
+}
 </style>
 </head>
 <body>
@@ -49,7 +81,9 @@ canvas{display:block;width:100%;cursor:default}
 <div class="headline">
   <div class="kicker">Timeline Analysis · Islamic Republic Regime · 2009–2026</div>
   <h1>From Arbitration to Consolidation</h1>
+  <a class="print-link" href="#">Print-Friendly</a>
   <p class="deck">How the elimination of brokers and mediators concentrated power in the three-man core — and made the system more dangerous, not less.</p>
+  <p class="asof-note">Data accurate as of March 2026</p>
 </div>
 <div class="canvas-wrap">
   <div id="detail-panel">
@@ -68,14 +102,19 @@ canvas{display:block;width:100%;cursor:default}
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 const DPR = window.devicePixelRatio || 1;
+const BASE_LAYOUT_W = 752;
+const BASE_LAYOUT_H = 560;
+const PRINT_MAX_CANVAS_MM = 148;
+const MM_PER_INCH = 25.4;
+const CSS_PX_PER_INCH = 96;
 
 const BG = '#f7f4ee', INK = '#1a1814', MUTED = '#9e9b95', RULE = '#c0bbb2';
 const CG = '#b06000', CE = '#1e4f8a', CV = '#1a4a2e';
 const TYPE_COL = {
   eliminated: '#8b1a1a',
-  repression: '#c47d00',
+  repression: '#b06000',
   milestone:  '#3a3835',
-  war:        '#2a5070',
+  war:        '#1e4f8a',
 };
 const MOJTABA_INSTALL_YEAR = 2026.35;
 
@@ -104,7 +143,7 @@ const PRINCIPALS = [
     { from:2021,   to:2024.67,label:'Interior Minister',     row:0, solid:true  },
     { from:2012,   to:2026.6, label:'Expediency Council',    row:1, solid:true  },
     { from:2021,   to:2026.6, label:'SNSC Member',           row:2, solid:true  },
-    { from:2024,   to:2026.17,label:'IRGC Deputy Cmdr',      row:3, solid:true  },
+    { from:2024,   to:2026.17,label:'IRGC Deputy Commander', row:3, solid:true  },
     { from:2026.17,to:2026.6, label:'IRGC Commander',        row:3, solid:true  },
   ]},
 ];
@@ -176,19 +215,35 @@ function xOf(year) {
 const WAR_Y = 20; // reference constant for hit detection
 let W, H, TL_LEFT, TL_RIGHT, TL_W, AXIS_Y, LANE_TOP, LANE_BOTTOM,
     EVT_DOT_Y, LBL_LEVEL_H, laidOutEvents, activeEvent = null;
+let forcePrintMode = false;
+
+function isPrintMode() {
+  return forcePrintMode || (window.matchMedia && window.matchMedia('print').matches);
+}
 
 function computeLayout() {
-  W = canvas.parentElement.clientWidth || 752;
-  const mobile = W < 420;
+  const printMode = isPrintMode();
+  const parentW = canvas.parentElement.clientWidth || BASE_LAYOUT_W;
+  let mobile = false;
 
-  // Fixed heights that are guaranteed to fit content
-  H = mobile ? 480 : 560;
+  if (printMode) {
+    const maxPrintH = Math.round((PRINT_MAX_CANVAS_MM / MM_PER_INCH) * CSS_PX_PER_INCH);
+    W = parentW;
+    H = Math.min(BASE_LAYOUT_H, maxPrintH);
+  } else {
+    W = parentW;
+    mobile = W < 420;
+    H = mobile ? 480 : BASE_LAYOUT_H;
+  }
 
-  canvas.width  = W * DPR;
-  canvas.height = H * DPR;
+  mobile = !printMode && W < 420;
+  const renderScale = printMode ? Math.max(2, DPR) : DPR;
+  canvas.width  = Math.round(W * renderScale);
+  canvas.height = Math.round(H * renderScale);
+  canvas.style.width = W + 'px';
   canvas.style.height = H + 'px';
   ctx.setTransform(1,0,0,1,0,0);
-  ctx.scale(DPR, DPR);
+  ctx.scale(renderScale, renderScale);
 
   // Margins
   TL_LEFT  = mobile ? 58 : Math.round(W * 0.145);  // wider left margin for long names
@@ -234,13 +289,14 @@ function computeLayout() {
   // Two alternating x columns, scaled by W
   const fanA = Math.round(clusterDotX - W * (mobile ? 0.16 : 0.18));
   const fanB = Math.round(clusterDotX - W * (mobile ? 0.30 : 0.32));
-  const CLUSTER_LBL_ROW_H = mobile ? 28 : 30;
+  const CLUSTER_LBL_ROW_H = mobile ? 28 : (printMode ? 26 : 30);
+  const clusterLblBaseY = mobile ? 16 : (printMode ? 34 : 22);
 
   EVENTS.filter(e=>e.cluster).forEach((e, i) => {
     e._dotX = e._x;
     e._dotY = EVT_DOT_Y + Math.round(e.dotYOff * (mobile ? 0.64 : 1));
     e._lblX = i % 2 === 0 ? fanA : fanB;
-    e._lblY = EVT_DOT_Y + i * CLUSTER_LBL_ROW_H + (mobile ? 16 : 22);
+    e._lblY = EVT_DOT_Y + i * CLUSTER_LBL_ROW_H + clusterLblBaseY;
   });
 
   // Standard event label slots — desktop only (mobile suppresses all labels)
@@ -300,7 +356,11 @@ function wrapText(text, x, y, maxW, lineH, anchor) {
 // ── Draw ──────────────────────────────────────────────────────
 function draw() {
   ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  const printMode = isPrintMode();
+  if (!printMode) {
+    ctx.fillStyle = BG;
+    ctx.fillRect(0, 0, W, H);
+  }
   const mobile = W < 420;
 
   // ── Axis ──
@@ -329,11 +389,13 @@ function draw() {
 
   // narrowing tint
   const nX1 = xOf(2019.8), nX2 = xOf(2026.6);
-  ctx.save(); ctx.globalAlpha=0.04; ctx.fillStyle=TYPE_COL.eliminated;
-  ctx.fillRect(nX1, AXIS_Y+1, nX2-nX1, Math.min(EVT_DOT_Y+80, H-36)-AXIS_Y); ctx.restore();
-  ctx.save(); ctx.font="500 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle='rgba(139,26,26,0.28)';
-  ctx.textAlign='center'; ctx.textBaseline='top';
-  ctx.fillText('THE NARROWING', (nX1+nX2)/2, AXIS_Y+6); ctx.restore();
+  if (!printMode) {
+    ctx.save(); ctx.globalAlpha=0.04; ctx.fillStyle=TYPE_COL.eliminated;
+    ctx.fillRect(nX1, AXIS_Y+1, nX2-nX1, Math.min(EVT_DOT_Y+80, H-36)-AXIS_Y); ctx.restore();
+    ctx.save(); ctx.font="600 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle='rgba(139,26,26,0.28)';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText('THE NARROWING', (nX1+nX2)/2, AXIS_Y+6); ctx.restore();
+  }
 
   // ── Principal lanes ──
   PRINCIPALS.forEach(p => {
@@ -371,7 +433,7 @@ function draw() {
       ctx.restore();
       if (role.solid) {
         ctx.save();
-        ctx.font = `300 ${mobile?6.5:7.5}px 'Source Sans 3',sans-serif`;
+        ctx.font = `600 ${mobile?6.5:7.5}px 'Source Sans 3',sans-serif`;
         ctx.globalAlpha = 0.88;
         if (bw > 32) {
           // label inside bar
@@ -422,7 +484,7 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(x-5, ev._warLabelY+12); ctx.lineTo(x+5, ev._warLabelY+12); ctx.stroke();
     // war label text — always shown, size scales with W
     ctx.globalAlpha=isActive?1:0.76;
-    ctx.font=`${isActive?600:500} ${mobile?7:8}px 'Source Sans 3',sans-serif`;
+    ctx.font=`${isActive?700:600} ${mobile?7:8}px 'Source Sans 3',sans-serif`;
     ctx.fillStyle=col; ctx.textAlign=ev._warAlign; ctx.textBaseline='alphabetic';
     const titleWords = ev.title.split(' ');
     const mid = Math.ceil(titleWords.length / 2);
@@ -434,7 +496,7 @@ function draw() {
     } else {
       ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 12);
     }
-    ctx.font=`300 ${mobile?6:7}px 'IBM Plex Mono',monospace`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
+    ctx.font=`600 ${printMode?(mobile?7:8):(mobile?6:7)}px 'IBM Plex Mono',monospace`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
     ctx.fillText(ev.sub.split('—')[0].trim(), ev._warLabelX, ev._warLabelY + (line2 ? 28 : 21));
     ctx.restore();
   });
@@ -510,7 +572,7 @@ function draw() {
       const lblY=isUp?EVT_DOT_Y-lvlOff:EVT_DOT_Y+lvlOff;
       const anchor=isUp?'bottom':'top';
       ctx.save(); ctx.globalAlpha=isActive?1:0.72;
-      ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
+      ctx.font=`${isActive?700:600} 7.5px 'Source Sans 3',sans-serif`;
       ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline=anchor;
       wrapText(ev.title, x, lblY, 82, 11, anchor);
       ctx.restore();
@@ -520,7 +582,7 @@ function draw() {
     EVENTS.filter(e=>e.cluster).forEach(ev => {
       const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
       ctx.save(); ctx.globalAlpha=isActive?1:0.75;
-      ctx.font=`${isActive?600:400} 7.5px 'Source Sans 3',sans-serif`;
+      ctx.font=`${isActive?700:600} 7.5px 'Source Sans 3',sans-serif`;
       ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline='middle';
       wrapText(ev.title, ev._lblX, ev._lblY, 88, 11, 'middle-wrap');
       ctx.restore();
@@ -550,7 +612,7 @@ function draw() {
       // label text
       ctx.save();
       ctx.globalAlpha=isActive?1:0.75;
-      ctx.font=`${isActive?500:400} 7px 'Source Sans 3',sans-serif`;
+      ctx.font=`${isActive?700:600} 7px 'Source Sans 3',sans-serif`;
       ctx.fillStyle=col;
       ctx.textAlign=align; ctx.textBaseline='middle';
       const lx = align==='left' ? x+8 : x-8;
@@ -560,13 +622,13 @@ function draw() {
   }
 
   // ── Legend ──
-  const legY = H - (mobile ? 22 : 30);
+  const legY = H - (mobile ? 22 : (printMode ? 14 : 30));
   const legItems = mobile
     ? [ { col:TYPE_COL.eliminated, label:'Killed' }, { col:TYPE_COL.repression, label:'Repression' }, { col:TYPE_COL.war, label:'War' }, { col:TYPE_COL.milestone, label:'Milestone' } ]
     : [ { col:TYPE_COL.eliminated, label:'Eliminated ✕' }, { col:TYPE_COL.repression, label:'Repression event' }, { col:TYPE_COL.war, label:'War' }, { col:TYPE_COL.milestone, label:'Power milestone' } ];
   let lx = TL_LEFT;
   const legFontSize = mobile ? 7.5 : 9;
-  ctx.font=`300 ${legFontSize}px 'Source Sans 3',sans-serif`;
+  ctx.font=`600 ${legFontSize}px 'Source Sans 3',sans-serif`;
   legItems.forEach(it => {
     ctx.beginPath(); ctx.arc(lx+4, legY, mobile?3.5:4.5, 0, Math.PI*2);
     ctx.fillStyle=it.col; ctx.fill();
@@ -654,10 +716,42 @@ window.addEventListener('resize', () => {
     draw();
   }, 80);
 });
-
 // Init
 computeLayout();
 draw();
+
+const printBtn = document.querySelector('.print-link');
+if (printBtn) {
+  printBtn.addEventListener('click', function(ev) {
+    ev.preventDefault();
+    forcePrintMode = true;
+    computeLayout();
+    draw();
+    setTimeout(function() { window.print(); }, 30);
+  });
+}
+
+if (window.matchMedia) {
+  const printMql = window.matchMedia('print');
+  const onPrintChange = function(e) {
+    forcePrintMode = !!e.matches;
+    computeLayout();
+    draw();
+  };
+  if (printMql.addEventListener) printMql.addEventListener('change', onPrintChange);
+  else if (printMql.addListener) printMql.addListener(onPrintChange);
+}
+
+window.addEventListener('beforeprint', () => {
+  forcePrintMode = true;
+  computeLayout();
+  draw();
+});
+window.addEventListener('afterprint', () => {
+  forcePrintMode = false;
+  computeLayout();
+  draw();
+});
 })();
 </script>
 </body>
