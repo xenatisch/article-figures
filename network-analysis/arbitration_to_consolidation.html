@@ -10,7 +10,7 @@ Interactive timeline figure showing the 2009–2026 consolidation of Iranian reg
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Narrowing — Iranian Power Timeline</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -20,19 +20,19 @@ Interactive timeline figure showing the 2009–2026 consolidation of Iranian reg
   --nw-accent:#8b1a1a;
   --nw-muted:#6f6a62;
 }
-body{background:var(--nw-paper);font-family:'Source Sans 3',sans-serif;color:var(--nw-ink)}
+body{background:var(--nw-paper);font-family:'Noto Serif',serif;color:var(--nw-ink)}
 .page{max-width:800px;margin:0 auto;padding:0 24px 56px}
 .masthead{border-top:2.5px solid var(--nw-ink);border-bottom:1px solid var(--nw-rule);padding:7px 0 6px;margin-bottom:4px;font-family:'Playfair Display',serif;font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
 .headline{position:relative;padding:18px 140px 15px 0;border-bottom:1px solid var(--nw-rule);margin-bottom:28px}
-.kicker{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--nw-accent);margin-bottom:6px}
+.kicker{font-family:'Noto Sans',sans-serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--nw-accent);margin-bottom:6px}
 h1{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1.1;color:#000;margin-bottom:10px}
 .deck{font-size:13.5px;font-weight:300;line-height:1.65;color:#3d3a34;max-width:600px}
-.asof-note{margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.05em;color:var(--nw-muted);text-transform:uppercase}
-.print-link{position:absolute;top:0;right:0;display:inline-block;margin:0;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#6e6a63;text-decoration:none;border:1px solid var(--nw-rule);padding:4px 8px;border-radius:2px}
+.asof-note{margin-top:6px;font-family:'Noto Sans',sans-serif;font-size:8px;letter-spacing:.05em;color:var(--nw-muted);text-transform:uppercase}
+.print-link{position:absolute;top:0;right:0;display:inline-block;margin:0;font-family:'Noto Sans',sans-serif;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#6e6a63;text-decoration:none;border:1px solid var(--nw-rule);padding:4px 8px;border-radius:2px}
 .print-link:hover{color:var(--nw-ink);border-color:#8f897f}
 .canvas-wrap{position:relative}
 canvas{display:block;width:100%;cursor:default}
-.hover-hint{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9e9b95;margin:6px 0 0;text-align:center}
+.hover-hint{font-family:'Noto Sans',sans-serif;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9e9b95;margin:6px 0 0;text-align:center}
 #detail-panel{
   display:none;
   position:absolute;
@@ -42,13 +42,13 @@ canvas{display:block;width:100%;cursor:default}
   border-top:1px solid #333;
   border-left:4px solid #8b1a1a;
   padding:14px 18px 16px;
-  font-family:'Source Sans 3',sans-serif;
+  font-family:'Noto Serif',serif;
   z-index:10;
 }
 #detail-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px}
-#detail-sub{font-size:8.5px;font-family:'IBM Plex Mono',monospace;color:#888;letter-spacing:.04em;margin-bottom:10px}
+#detail-sub{font-size:8.5px;font-family:'Noto Sans',sans-serif;color:#888;letter-spacing:.04em;margin-bottom:10px}
 #detail-body{font-size:11px;font-weight:300;color:#c8c4bc;line-height:1.65;max-width:620px}
-#detail-close{position:absolute;top:10px;right:14px;font-size:11px;color:#666;cursor:pointer;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em}
+#detail-close{position:absolute;top:10px;right:14px;font-size:11px;color:#666;cursor:pointer;font-family:'Noto Sans',sans-serif;letter-spacing:.05em}
 #detail-close:hover{color:#aaa}
 #tip{display:none}
 
@@ -139,7 +139,7 @@ const PRINCIPALS = [
   ]},
   { id:'V', label:'Vahidi', col:CV, roles:[
     { from:2009,   to:2013,   label:'Defence Minister',      row:0, solid:true  },
-    { from:2013,   to:2021,   label:'IRGC / senior defence', row:0, solid:false },
+    { from:2013,   to:2021,   label:'IRGC / Senior Defence', row:0, solid:true  },
     { from:2021,   to:2024.67,label:'Interior Minister',     row:0, solid:true  },
     { from:2012,   to:2026.6, label:'Expediency Council',    row:1, solid:true  },
     { from:2021,   to:2026.6, label:'SNSC Member',           row:2, solid:true  },
@@ -180,7 +180,7 @@ const EVENTS = [
   { year:2026.0,  type:'repression', cluster:true, dotYOff:0,
     title:'Jan 2026 massacre',
     sub:'Over 30,000 killed',
-    body:"The terminal repression event. Eje'i: 'If we want to do something, we have to do it fast.' Ghalibaf provides parliamentary cover. Vahidi holds the IRGC command chain. Over 30,000 killed in the opening weeks." },
+    body:"The terminal repression event. Eje'i publicly repeats the no-leniency directive he had already issued in 2022: 'If we want to do something, we have to do it fast.' Ghalibaf provides parliamentary cover. Vahidi holds the IRGC command chain. Over 30,000 killed in the opening weeks." },
   { year:2026.08, type:'eliminated', cluster:true, dotYOff:22,
     title:'Khamenei targeted killing',
     sub:'28 February 2026 — Israeli strike',
@@ -233,7 +233,8 @@ function computeLayout() {
   } else {
     W = parentW;
     mobile = W < 420;
-    H = mobile ? 480 : BASE_LAYOUT_H;
+    // Mobile keeps all role rows visible, so allocate more vertical room.
+    H = mobile ? 620 : BASE_LAYOUT_H;
   }
 
   mobile = !printMode && W < 420;
@@ -247,20 +248,18 @@ function computeLayout() {
 
   // Margins
   TL_LEFT  = mobile ? 58 : Math.round(W * 0.145);  // wider left margin for long names
-  TL_RIGHT = mobile ? W - 20 : W - 46;
+  TL_RIGHT = mobile ? W - 2 : W - 46;
   TL_W     = TL_RIGHT - TL_LEFT;
 
   // Vertical anchors — fixed pixel values on mobile, proportional on desktop
-  AXIS_Y    = mobile ? 50  : 78;
+  AXIS_Y    = mobile ? 58  : 78;
   LANE_TOP  = mobile ? 72  : 116;
   LBL_LEVEL_H = mobile ? 22 : 26;
 
   // Principal lane heights
-  // On mobile: only draw row 0 (primary role bar) — no stacked rows
-  // This keeps each principal to exactly ROW_H tall
   let yRunner = LANE_TOP;
   PRINCIPALS.forEach(p => {
-    const maxRow = mobile ? 0 : Math.max(...p.roles.map(r => r.row));
+    const maxRow = Math.max(...p.roles.map(r => r.row));
     p.yTop = yRunner;
     p.yBot = yRunner + (maxRow + 1) * (ROW_H + ROW_GAP) - ROW_GAP;
     p.yCen = (p.yTop + p.yBot) / 2;
@@ -274,13 +273,30 @@ function computeLayout() {
   // Recompute all event x positions
   EVENTS.forEach(e => { e._x = xOf(e.year); });
 
-  // War labels — fixed y positions that don't compress on mobile
-  const WAR_LABEL_YS = mobile ? [10, 28] : [16, 36];
-  EVENTS.filter(e=>e.isWar).forEach((e, i) => {
-    e._warAlign  = i === 0 ? 'right' : 'left';
-    e._warLabelX = i === 0 ? e._x - 6 : e._x + 6;
-    e._warLabelY = WAR_LABEL_YS[i];
-  });
+  // War labels — mobile uses explicit outside labels near each war event with elbow connectors.
+  const warEvents = EVENTS.filter(e=>e.isWar);
+  if (mobile) {
+    const warMaxW = Math.min(106, Math.max(84, Math.floor(TL_W * 0.48)));
+    // First war label intentionally lower than second for cleaner separation.
+    const warLabelRows = [24, 2];
+    warEvents.forEach((e, i) => {
+      e._warAlign = 'right';
+      e._warMaxW = warMaxW;
+      e._warLabelX = Math.max(
+        TL_LEFT + warMaxW + 2,
+        Math.min(TL_RIGHT - 2, e._x - 8)
+      );
+      e._warLabelY = warLabelRows[i] ?? (warLabelRows[warLabelRows.length - 1] + (i - warLabelRows.length + 1) * 31);
+    });
+  } else {
+    const WAR_LABEL_YS = [16, 36];
+    warEvents.forEach((e, i) => {
+      e._warAlign  = i === 0 ? 'right' : 'left';
+      e._warLabelX = i === 0 ? e._x - 6 : e._x + 6;
+      e._warMaxW = 112;
+      e._warLabelY = WAR_LABEL_YS[i];
+    });
+  }
 
   // Cluster labels — fan left of dot cluster
   // On mobile scale the dotYOff and fan distance with W ratio
@@ -346,11 +362,12 @@ function wrapText(text, x, y, maxW, lineH, anchor) {
     // centre-aligned vertically around y
     const th = (ls.length - 1) * lineH;
     ls.forEach((l, i) => ctx.fillText(l, x, y - th/2 + i * lineH));
-    return;
+    return ls.length;
   }
   if (anchor === 'bottom') ls.reverse();
   const sign = anchor === 'bottom' ? -1 : 1;
   ls.forEach((l, i) => ctx.fillText(l, x, y + sign * i * lineH));
+  return ls.length;
 }
 
 // ── Draw ──────────────────────────────────────────────────────
@@ -373,7 +390,7 @@ function draw() {
   const bx = (breakX1+breakX2)/2;
   ctx.save(); ctx.strokeStyle = MUTED; ctx.lineWidth = 1.2;
   ctx.beginPath(); ctx.moveTo(bx-8,AXIS_Y-5); ctx.lineTo(bx-3,AXIS_Y+5); ctx.lineTo(bx+3,AXIS_Y-5); ctx.lineTo(bx+8,AXIS_Y+5); ctx.stroke();
-  ctx.font="400 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.font="400 8px 'Noto Sans',sans-serif"; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='top';
   ctx.fillText('2014 – 2019', bx, AXIS_Y+8); ctx.restore();
 
   const tickYears = mobile
@@ -383,7 +400,7 @@ function draw() {
   tickYears.forEach(y => {
     const x = xOf(y);
     ctx.beginPath(); ctx.moveTo(x,AXIS_Y-3); ctx.lineTo(x,AXIS_Y+3); ctx.strokeStyle=RULE; ctx.lineWidth=1; ctx.stroke();
-    ctx.font=`400 ${mobile?7:8.5}px 'IBM Plex Mono',monospace`; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.font=`400 ${mobile?7.5:9}px 'Noto Sans',sans-serif`; ctx.fillStyle=MUTED; ctx.textAlign='center'; ctx.textBaseline='bottom';
     ctx.fillText(y, x, AXIS_Y-6);
   });
 
@@ -392,7 +409,7 @@ function draw() {
   if (!printMode) {
     ctx.save(); ctx.globalAlpha=0.04; ctx.fillStyle=TYPE_COL.eliminated;
     ctx.fillRect(nX1, AXIS_Y+1, nX2-nX1, Math.min(EVT_DOT_Y+80, H-36)-AXIS_Y); ctx.restore();
-    ctx.save(); ctx.font="600 7.5px 'IBM Plex Mono',monospace"; ctx.fillStyle='rgba(139,26,26,0.28)';
+    ctx.save(); ctx.font="400 8px 'Noto Sans',sans-serif"; ctx.fillStyle='rgba(139,26,26,0.28)';
     ctx.textAlign='center'; ctx.textBaseline='top';
     ctx.fillText('THE NARROWING', (nX1+nX2)/2, AXIS_Y+6); ctx.restore();
   }
@@ -400,28 +417,31 @@ function draw() {
   // ── Principal lanes ──
   PRINCIPALS.forEach(p => {
     // Principal name — split onto two lines if too wide for margin
-    ctx.font = `600 ${mobile?8:10}px 'Source Sans 3',sans-serif`;
+    ctx.font = `700 ${mobile?8:10}px 'Playfair Display',serif`;
     ctx.fillStyle=p.col; ctx.textAlign='right'; ctx.textBaseline='middle';
     const maxLblW = TL_LEFT - 12;
+    const pNameX = TL_LEFT - (mobile ? 12 : 8);
     if (ctx.measureText(p.label).width <= maxLblW) {
-      ctx.fillText(p.label, TL_LEFT-8, p.yCen);
+      ctx.fillText(p.label, pNameX, p.yCen);
     } else {
       // split at hyphen or midpoint
       const hyphen = p.label.indexOf('-');
       const splitAt = hyphen > 0 ? hyphen + 1 : Math.ceil(p.label.length / 2);
       const line1 = p.label.slice(0, splitAt);
       const line2 = p.label.slice(splitAt);
-      ctx.font = `600 ${mobile?7:9}px 'Source Sans 3',sans-serif`;
-      ctx.fillText(line1, TL_LEFT-8, p.yCen - 5);
-      ctx.fillText(line2, TL_LEFT-8, p.yCen + 6);
+      ctx.font = `700 ${mobile?7:9}px 'Playfair Display',serif`;
+      ctx.fillText(line1, pNameX, p.yCen - 5);
+      ctx.fillText(line2, pNameX, p.yCen + 6);
     }
 
     p.roles.forEach(role => {
-      if (mobile && role.row > 0) return; // only primary bar on mobile
       const x1=xOf(role.from), x2=xOf(role.to), bw=x2-x1;
       if (bw<1) return;
       const yTop = p.yTop + role.row*(ROW_H+ROW_GAP);
       const bh   = ROW_H - (role.row>0 ? 2 : 0);
+      const forceLeftOutsideRole = role.label === 'Intelligence Ministry (MIOS)';
+      const forceBelowOutsideRole = role.label === 'IRGC Commander';
+      const forceOutsideRole = forceLeftOutsideRole || forceBelowOutsideRole;
       ctx.save();
       ctx.globalAlpha = role.solid ? 0.68 : 0.16;
       ctx.fillStyle = p.col;
@@ -433,9 +453,9 @@ function draw() {
       ctx.restore();
       if (role.solid) {
         ctx.save();
-        ctx.font = `600 ${mobile?6.5:7.5}px 'Source Sans 3',sans-serif`;
+        ctx.font = `400 ${mobile?7:8}px 'Noto Serif',serif`;
         ctx.globalAlpha = 0.88;
-        if (bw > 32) {
+        if (bw > 32 && !forceOutsideRole) {
           // label inside bar
           ctx.fillStyle = '#fff';
           ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -443,28 +463,101 @@ function draw() {
           while (ctx.measureText(lbl).width > bw-6 && lbl.length > 5) lbl = lbl.slice(0,-4)+'…';
           ctx.fillText(lbl, x1+bw/2, yTop+bh/2);
         } else {
-          // bar too narrow — label outside; left side only when bar starts near left edge
-          const goLeft = x1 < TL_LEFT + 60;
+          // bar too narrow — choose outside side based on available space
+          const words = role.label.split(' ');
+          let l1 = role.label, l2 = '';
+          if (words.length > 1) {
+            const mid = Math.ceil(words.length / 2);
+            l1 = words.slice(0, mid).join(' ');
+            l2 = words.slice(mid).join(' ');
+          }
+          const lineW = Math.max(ctx.measureText(l1).width, l2 ? ctx.measureText(l2).width : 0);
+          const neededW = lineW + 6;
+          const leftSpace = x1 - (TL_LEFT + 2);
+          const rightSpace = (TL_RIGHT - 2) - x2;
+          const canRight = rightSpace >= neededW;
+          const canLeft = leftSpace >= neededW;
+          const goLeft = canLeft && (!canRight || rightSpace < 16);
+
           ctx.fillStyle = p.col;
           ctx.textAlign = goLeft ? 'right' : 'left';
           ctx.textBaseline = 'middle';
-          const lx = goLeft ? x1-5 : x2+5;
-          // split into two lines if label has multiple words
-          const words = role.label.split(' ');
-          if (words.length > 1) {
-            const mid = Math.ceil(words.length / 2);
-            const l1 = words.slice(0, mid).join(' ');
-            const l2 = words.slice(mid).join(' ');
+          let lx = goLeft ? (x1 - 5) : (x2 + 5);
+          if (goLeft) lx = Math.max(lx, TL_LEFT + neededW);
+          else lx = Math.min(lx, TL_RIGHT - neededW);
+          if (mobile && !goLeft && x1 <= TL_LEFT + 2) {
+            // Keep early-period narrow labels clear of principal names on the left.
+            lx = Math.max(lx, TL_LEFT + 30);
+          }
+          if (forceLeftOutsideRole) {
+            // Keep this specific early role explicit and fully out of the lane bars.
+            const forcedX = TL_LEFT - (mobile ? 4 : 8);
+            const forcedLines = mobile
+              ? ['Intelligence', 'Ministry (MIOS)']
+              : ['Intelligence Ministry', '(MIOS)'];
+            const lineH = mobile ? 6 : 8;
+            const firstY = mobile
+              ? (yTop + bh + 4)
+              : (yTop + bh/2 - (forcedLines.length - 1) * (lineH / 2));
+            ctx.font = `400 ${mobile ? 6.2 : 7.2}px 'Noto Sans',sans-serif`;
+            ctx.fillStyle = p.col;
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            forcedLines.forEach((line, idx) => {
+              ctx.fillText(line, forcedX, firstY + idx * lineH);
+            });
+            const labelMidY = firstY + ((forcedLines.length - 1) * lineH) / 2;
+            const startX = Math.min(x2 - 1, x1 + Math.max(3, bw * 0.45));
+            ctx.globalAlpha = 0.45;
+            ctx.strokeStyle = p.col;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(startX, yTop + bh/2);
+            ctx.lineTo(TL_LEFT - 1, yTop + bh/2);
+            ctx.lineTo(TL_LEFT - 1, labelMidY);
+            ctx.lineTo(forcedX + 2, labelMidY);
+            ctx.stroke();
+            ctx.restore();
+            return;
+          }
+          if (forceBelowOutsideRole) {
+            // Keep end-of-range command role outside to avoid overlap with adjacent same-colour bar.
+            const forcedX = Math.min(TL_RIGHT - 1, x2);
+            const forcedLines = mobile ? ['IRGC', 'Commander'] : ['IRGC Commander'];
+            const lineH = mobile ? 6 : 8;
+            const firstY = yTop + bh + (mobile ? 3 : 4);
+            ctx.font = `400 ${mobile ? 6.6 : 7.4}px 'Noto Sans',sans-serif`;
+            ctx.fillStyle = p.col;
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'top';
+            forcedLines.forEach((line, idx) => {
+              ctx.fillText(line, forcedX, firstY + idx * lineH);
+            });
+            const labelY = firstY + (forcedLines.length === 1 ? lineH * 0.5 : lineH);
+            ctx.globalAlpha = 0.45;
+            ctx.strokeStyle = p.col;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(x1 + Math.max(2, bw * 0.55), yTop + bh/2);
+            ctx.lineTo(forcedX - 1, yTop + bh/2);
+            ctx.lineTo(forcedX - 1, labelY);
+            ctx.stroke();
+            ctx.restore();
+            return;
+          }
+
+          if (l2) {
             ctx.fillText(l1, lx, yTop + bh/2 - 4);
             ctx.fillText(l2, lx, yTop + bh/2 + 5);
           } else {
-            ctx.fillText(role.label, lx, yTop + bh/2);
+            ctx.fillText(l1, lx, yTop + bh/2);
           }
           ctx.globalAlpha = 0.4;
           ctx.strokeStyle = p.col; ctx.lineWidth = 0.8;
           ctx.beginPath();
+          const hookX = goLeft ? Math.max(x1 - 4, lx - 6) : Math.min(x2 + 4, lx + 6);
           ctx.moveTo(goLeft ? x1 : x2, yTop+bh/2);
-          ctx.lineTo(goLeft ? x1-4 : x2+4, yTop+bh/2);
+          ctx.lineTo(hookX, yTop+bh/2);
           ctx.stroke();
         }
         ctx.restore();
@@ -475,30 +568,79 @@ function draw() {
   // ── War events at top — text only on desktop ──
   EVENTS.filter(e=>e.isWar).forEach(ev => {
     const x=ev._x, col=TYPE_COL.war, isActive=activeEvent===ev;
-    ctx.save();
-    ctx.strokeStyle=col; ctx.lineWidth=isActive?1.5:0.9; ctx.globalAlpha=isActive?0.6:0.3;
-    ctx.setLineDash([4,3]);
-    ctx.beginPath(); ctx.moveTo(x, ev._warLabelY+12); ctx.lineTo(x, AXIS_Y); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.lineWidth=isActive?2:1.2; ctx.globalAlpha=isActive?0.75:0.4;
-    ctx.beginPath(); ctx.moveTo(x-5, ev._warLabelY+12); ctx.lineTo(x+5, ev._warLabelY+12); ctx.stroke();
-    // war label text — always shown, size scales with W
-    ctx.globalAlpha=isActive?1:0.76;
-    ctx.font=`${isActive?700:600} ${mobile?7:8}px 'Source Sans 3',sans-serif`;
-    ctx.fillStyle=col; ctx.textAlign=ev._warAlign; ctx.textBaseline='alphabetic';
-    const titleWords = ev.title.split(' ');
-    const mid = Math.ceil(titleWords.length / 2);
-    const line1 = titleWords.slice(0, mid).join(' ');
-    const line2 = titleWords.slice(mid).join(' ');
-    if (line2) {
-      ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 5);
-      ctx.fillText(line2, ev._warLabelX, ev._warLabelY + 5 + 10);
+    if (mobile) {
+      ctx.save();
+      // war label text — mobile columns
+      ctx.globalAlpha=isActive?1:0.76;
+      ctx.font=`400 7.5px 'Playfair Display',serif`;
+      ctx.fillStyle=col; ctx.textAlign=ev._warAlign || 'right'; ctx.textBaseline='top';
+      ctx.textBaseline = 'top';
+      const titleH = 7.4;
+      const subH = 6.1;
+      const warMaxW = ev._warMaxW || 96;
+      const labelX = ev._warLabelX;
+      const titleY = ev._warLabelY + 1;
+      const titleLines = wrapText(ev.title, labelX, titleY, warMaxW, titleH, 'top');
+      ctx.font=`400 ${printMode?7.5:6.5}px 'Noto Sans',sans-serif`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
+      // Keep full subtitle text on mobile (no truncation by em-dash split).
+      const subY = titleY + titleLines * titleH + 1;
+      const subLines = wrapText(ev.sub, labelX, subY, warMaxW, subH, 'top');
+
+      // Elbow connector from event x to nearest edge of the label block.
+      const textBottomY = subY + Math.max(1, subLines) * subH + 1;
+      const connectorY = Math.min(AXIS_Y - 8, textBottomY);
+      const labelLeft = (ev._warAlign === 'right') ? (labelX - warMaxW) : labelX;
+      const labelRight = (ev._warAlign === 'right') ? labelX : (labelX + warMaxW);
+      const anchorX = Math.abs(x - labelLeft) < Math.abs(x - labelRight) ? labelLeft : labelRight;
+
+      ctx.strokeStyle = col;
+      ctx.lineWidth = isActive ? 1.5 : 0.9;
+      ctx.globalAlpha = isActive ? 0.6 : 0.3;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath();
+      ctx.moveTo(x, AXIS_Y);
+      ctx.lineTo(x, connectorY);
+      ctx.lineTo(anchorX, connectorY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineWidth = isActive ? 2 : 1.2;
+      ctx.globalAlpha = isActive ? 0.75 : 0.4;
+      ctx.beginPath();
+      ctx.moveTo(x - 4, AXIS_Y);
+      ctx.lineTo(x + 4, AXIS_Y);
+      ctx.stroke();
+      ctx.restore();
     } else {
-      ctx.fillText(line1, ev._warLabelX, ev._warLabelY + 12);
+      const warStemTop = ev._warLabelY + 12;
+      ctx.save();
+      ctx.strokeStyle=col; ctx.lineWidth=isActive?1.5:0.9; ctx.globalAlpha=isActive?0.6:0.3;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, warStemTop); ctx.lineTo(x, AXIS_Y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineWidth=isActive?2:1.2; ctx.globalAlpha=isActive?0.75:0.4;
+      ctx.beginPath(); ctx.moveTo(x-5, warStemTop); ctx.lineTo(x+5, warStemTop); ctx.stroke();
+      // war label text — desktop
+      ctx.globalAlpha=isActive?1:0.76;
+      ctx.font=`400 8.5px 'Playfair Display',serif`;
+      ctx.fillStyle=col; ctx.textAlign=ev._warAlign; ctx.textBaseline='alphabetic';
+      const titleWords = ev.title.split(' ');
+      const mid = Math.ceil(titleWords.length / 2);
+      const line1 = titleWords.slice(0, mid).join(' ');
+      const line2 = titleWords.slice(mid).join(' ');
+      const warLine1Y = ev._warLabelY + 5;
+      const warLineGap = 10;
+      const warSingleY = ev._warLabelY + 12;
+      if (line2) {
+        ctx.fillText(line1, ev._warLabelX, warLine1Y);
+        ctx.fillText(line2, ev._warLabelX, warLine1Y + warLineGap);
+      } else {
+        ctx.fillText(line1, ev._warLabelX, warSingleY);
+      }
+      ctx.font=`400 ${printMode?8.5:7.5}px 'Noto Sans',sans-serif`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
+      const warSubY = ev._warLabelY + (line2 ? 28 : 21);
+      ctx.fillText(ev.sub.split('—')[0].trim(), ev._warLabelX, warSubY);
+      ctx.restore();
     }
-    ctx.font=`600 ${printMode?(mobile?7:8):(mobile?6:7)}px 'IBM Plex Mono',monospace`; ctx.globalAlpha=(isActive?1:0.76)*0.7;
-    ctx.fillText(ev.sub.split('—')[0].trim(), ev._warLabelX, ev._warLabelY + (line2 ? 28 : 21));
-    ctx.restore();
   });
 
   // ── Standard events: drop lines ──
@@ -556,7 +698,7 @@ function draw() {
     ctx.fillStyle=col; ctx.fill();
     if (isActive) { ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke(); }
     if (ev.type==='eliminated') {
-      ctx.font=`bold ${Math.round(dotR*.9)}px sans-serif`;
+      ctx.font=`400 ${Math.round(dotR*.9)}px sans-serif`;
       ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText('✕', x, y+0.5);
     }
@@ -572,7 +714,7 @@ function draw() {
       const lblY=isUp?EVT_DOT_Y-lvlOff:EVT_DOT_Y+lvlOff;
       const anchor=isUp?'bottom':'top';
       ctx.save(); ctx.globalAlpha=isActive?1:0.72;
-      ctx.font=`${isActive?700:600} 7.5px 'Source Sans 3',sans-serif`;
+      ctx.font=`400 8px 'Playfair Display',serif`;
       ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline=anchor;
       wrapText(ev.title, x, lblY, 82, 11, anchor);
       ctx.restore();
@@ -582,7 +724,7 @@ function draw() {
     EVENTS.filter(e=>e.cluster).forEach(ev => {
       const col=TYPE_COL[ev.type], isActive=activeEvent===ev;
       ctx.save(); ctx.globalAlpha=isActive?1:0.75;
-      ctx.font=`${isActive?700:600} 7.5px 'Source Sans 3',sans-serif`;
+      ctx.font=`400 8px 'Playfair Display',serif`;
       ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline='middle';
       wrapText(ev.title, ev._lblX, ev._lblY, 88, 11, 'middle-wrap');
       ctx.restore();
@@ -612,7 +754,7 @@ function draw() {
       // label text
       ctx.save();
       ctx.globalAlpha=isActive?1:0.75;
-      ctx.font=`${isActive?700:600} 7px 'Source Sans 3',sans-serif`;
+      ctx.font=`400 7.5px 'Playfair Display',serif`;
       ctx.fillStyle=col;
       ctx.textAlign=align; ctx.textBaseline='middle';
       const lx = align==='left' ? x+8 : x-8;
@@ -627,8 +769,8 @@ function draw() {
     ? [ { col:TYPE_COL.eliminated, label:'Killed' }, { col:TYPE_COL.repression, label:'Repression' }, { col:TYPE_COL.war, label:'War' }, { col:TYPE_COL.milestone, label:'Milestone' } ]
     : [ { col:TYPE_COL.eliminated, label:'Eliminated ✕' }, { col:TYPE_COL.repression, label:'Repression event' }, { col:TYPE_COL.war, label:'War' }, { col:TYPE_COL.milestone, label:'Power milestone' } ];
   let lx = TL_LEFT;
-  const legFontSize = mobile ? 7.5 : 9;
-  ctx.font=`600 ${legFontSize}px 'Source Sans 3',sans-serif`;
+  const legFontSize = mobile ? 8 : 9.5;
+  ctx.font=`400 ${legFontSize}px 'Noto Serif',serif`;
   legItems.forEach(it => {
     ctx.beginPath(); ctx.arc(lx+4, legY, mobile?3.5:4.5, 0, Math.PI*2);
     ctx.fillStyle=it.col; ctx.fill();
@@ -670,7 +812,13 @@ canvas.addEventListener('mousemove', ev => {
   let hit=null;
   EVENTS.forEach(e => {
     if (e.isWar) {
-      if (Math.abs(mx-e._x)<12 && my>=e._warLabelY && my<=AXIS_Y) hit=e;
+      const onStem = Math.abs(mx-e._x)<12 && my>=e._warLabelY && my<=AXIS_Y;
+      const warLeft = (e._warAlign === 'right') ? (e._warLabelX - (e._warMaxW || 0)) : e._warLabelX;
+      const warRight = (e._warAlign === 'right') ? e._warLabelX : (e._warLabelX + (e._warMaxW || 0));
+      const onLabel = (mobile && e._warMaxW)
+        ? (mx>=warLeft && mx<=warRight && my>=e._warLabelY && my<=AXIS_Y-6)
+        : false;
+      if (onStem || onLabel) hit=e;
     } else if (e.cluster) {
       if (Math.hypot(mx-e._dotX, my-e._dotY)<10) hit=e;
     } else {
@@ -695,7 +843,13 @@ canvas.addEventListener('touchstart', ev => {
   let hit=null;
   EVENTS.forEach(e => {
     if (e.isWar) {
-      if (Math.abs(mx-e._x)<18 && my>=e._warLabelY && my<=AXIS_Y) hit=e;
+      const onStem = Math.abs(mx-e._x)<18 && my>=e._warLabelY && my<=AXIS_Y;
+      const warLeft = (e._warAlign === 'right') ? (e._warLabelX - (e._warMaxW || 0)) : e._warLabelX;
+      const warRight = (e._warAlign === 'right') ? e._warLabelX : (e._warLabelX + (e._warMaxW || 0));
+      const onLabel = (mobile && e._warMaxW)
+        ? (mx>=warLeft-4 && mx<=warRight+4 && my>=e._warLabelY-2 && my<=AXIS_Y-4)
+        : false;
+      if (onStem || onLabel) hit=e;
     } else if (e.cluster) {
       if (Math.hypot(mx-e._dotX, my-e._dotY)<16) hit=e;
     } else {
