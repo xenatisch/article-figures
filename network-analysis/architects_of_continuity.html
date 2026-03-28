@@ -567,8 +567,17 @@ body.publication-export .analytics-consent { display: none !important; }
 
 @media print {
   body { background: #fff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  .page { max-width: none; padding: 0 !important; }
+  .page { max-width: none; padding: 0 !important; break-inside: avoid-page !important; page-break-inside: avoid !important; }
+  .grid { break-after: avoid-page !important; page-break-after: avoid !important; }
   .sec, .col-heads, .row, .band { break-inside: avoid-page !important; page-break-inside: avoid !important; }
+  .license-footer {
+    break-before: avoid-page !important;
+    page-break-before: avoid !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+    margin-top: 8px !important;
+    padding-top: 6px !important;
+  }
   .print-link, .hint, .tab-bar, #tip, #mob-drawer, #mob-drawer-overlay { display: none !important; }
   .c-desc { display: none !important; }
   .legend-wrap { margin-bottom: 10px !important; padding-bottom: 8px !important; }
