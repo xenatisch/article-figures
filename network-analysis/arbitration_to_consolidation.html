@@ -1061,18 +1061,31 @@ window.addEventListener('afterprint', () => {
   var consentKey = 'nwAnalyticsConsent';
   var gaId = 'G-GXFZNMQ7L0';
   var banner = document.getElementById('analytics-consent');
-  var loaded = false;
+  var initialized = false;
+
+  function initGtag() {
+    if (initialized) return;
+    initialized = true;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', gaId, { anonymize_ip: true });
+  }
 
   function loadAnalytics() {
-    if (loaded) return;
-    loaded = true;
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = window.gtag || function(){ dataLayer.push(arguments); };
-    gtag('js', new Date());
-    gtag('config', gaId);
+    if (initialized) return;
+    var existing = document.querySelector('script[data-ga-loader="' + gaId + '"]');
+    if (existing) {
+      if (window.gtag) initGtag();
+      else existing.addEventListener('load', initGtag, { once: true });
+      return;
+    }
     var s = document.createElement('script');
     s.async = true;
+    s.setAttribute('data-ga-loader', gaId);
     s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId);
+    s.addEventListener('load', initGtag, { once: true });
+    s.addEventListener('error', function() { initialized = false; }, { once: true });
     document.head.appendChild(s);
   }
 
