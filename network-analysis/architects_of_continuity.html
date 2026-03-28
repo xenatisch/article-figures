@@ -22,7 +22,6 @@ Interactive comparison figure mapping the three principal actors across origins,
 body { background: var(--nw-paper); font-family: 'Noto Serif',serif; color: var(--nw-ink); font-size: 15px; }
 .page { max-width: 800px; margin: 0 auto; padding: 0 24px 60px; }
 
-.masthead { border-top: 2.5px solid var(--nw-ink); border-bottom: 1px solid var(--nw-rule); padding: 7px 0 6px; margin-bottom: 4px; font-family: 'Playfair Display', serif; font-size: 10px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
 .headline { position: relative; padding: 18px 140px 15px 0; border-bottom: 1px solid var(--nw-rule); margin-bottom: 20px; }
 .kicker { font-family: 'Noto Sans',sans-serif; font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: var(--nw-accent); margin-bottom: 6px; }
 h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1.1; color: #000; margin-bottom: 10px; }
@@ -44,6 +43,66 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 .hint { display: flex; align-items: center; gap: 10px; font-family: 'Noto Sans',sans-serif; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #4a4844; margin-bottom: 20px; font-weight: 500; }
 .hint-icon { width: 24px; height: 24px; border: 2px solid #9e9b95; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #4a4844; animation: pulse 2.5s ease-in-out infinite; flex-shrink: 0; }
 @keyframes pulse { 0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
+
+.analytics-consent {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 10050;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 1px solid #4a453c;
+  border-radius: 4px;
+  background: rgba(26,24,20,.95);
+  color: #f0ece3;
+  font-family: 'Noto Sans',sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.analytics-consent.visible { display: flex; }
+.analytics-consent p { margin: 0; flex: 1 1 280px; }
+.analytics-consent-actions { display: flex; gap: 8px; }
+.analytics-consent button {
+  appearance: none;
+  border: 1px solid #6a6358;
+  background: #2a2824;
+  color: #f0ece3;
+  padding: 6px 10px;
+  border-radius: 3px;
+  font-family: 'Noto Sans',sans-serif;
+  font-size: 10px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.analytics-consent button[data-consent="allow"] {
+  border-color: #1e4f8a;
+  background: #1e4f8a;
+}
+.analytics-consent button:hover { filter: brightness(1.08); }
+.license-footer {
+  margin-top: 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--nw-rule);
+  font-family: 'Noto Sans',sans-serif;
+  font-size: 10px;
+  line-height: 1.5;
+  color: #6f6a62;
+}
+.license-footer a { color: #3d3a34; }
+.license-footer a:hover { color: #1a1814; }
+
+/* publication export mode: keep legend + figure only */
+body.publication-export .headline,
+body.publication-export .hint,
+body.publication-export .print-link { display: none !important; }
+body.publication-export .page { padding-top: 0 !important; }
+body.publication-export .analytics-consent { display: none !important; }
 
 /* ── GRID ── */
 /* 4 columns: label (220px) | G | E | V */
@@ -498,9 +557,11 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
     padding: 8px 12px;
   }
   #tip { display: none !important; }
+  .analytics-consent { left: 0; right: 0; bottom: 0; border-radius: 0; border-left: none; border-right: none; }
 }
 
 @page { size: A4; margin: 1cm; }
+@page publication-arch { size: 210mm 2000mm; margin: 0; }
 
 @media print {
   body { background: #fff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -533,13 +594,41 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
   .cell.empty::after, .band-cell.empty::after { display: none !important; content: none !important; }
   .row:hover, .row.active, .band:hover, .band.active { filter: none !important; box-shadow: none !important; }
   .col-heads { position: static; }
+  .analytics-consent { display: none !important; }
+  body.publication-export .page { page: publication-arch; }
+  body.publication-export .sec,
+  body.publication-export .col-heads,
+  body.publication-export .row,
+  body.publication-export .band { break-inside: auto !important; page-break-inside: auto !important; }
+  body.publication-export .col-heads,
+  body.publication-export .sec,
+  body.publication-export .row,
+  body.publication-export .band { grid-template-columns: 220px 1fr 1fr 1fr !important; }
+  body.publication-export .lbl,
+  body.publication-export .band-lbl { width: 220px !important; min-width: 220px !important; max-width: 220px !important; }
+  body.publication-export .li { font-size: 11pt !important; letter-spacing: .035em !important; gap: 7px !important; }
+  body.publication-export .legend-wrap .badge { font-size: 11pt !important; }
+  body.publication-export .kill-leg { width: 15px !important; height: 15px !important; font-size: 11pt !important; }
+  body.publication-export .grid * { font-size: 11pt !important; line-height: 1.24 !important; }
+  body.publication-export .grid .sec-label,
+  body.publication-export .grid .ch-name,
+  body.publication-export .grid .lbl-name,
+  body.publication-export .grid .band-name { font-size: 13pt !important; }
+  body.publication-export .grid .lbl-sub,
+  body.publication-export .grid .band-sub,
+  body.publication-export .grid .ch-role { font-size: 11pt !important; }
+  body.publication-export .grid .badge,
+  body.publication-export .grid .lbl-kill,
+  body.publication-export .grid .band-kill { font-size: 11pt !important; font-weight: 500 !important; line-height: 1.24 !important; }
+  body.publication-export .grid .lbl-kill::before,
+  body.publication-export .grid .band-kill::before { width: 14px !important; height: 14px !important; font-size: 10pt !important; }
+  body.publication-export .grid .badge.bsanc { font-size: 11pt !important; }
 }
 </style>
 </head>
 <body>
 <div class="page">
 
-<div class="masthead">Iranian Power Network — Analysis</div>
 <div class="headline">
   <div class="kicker">Network Analysis · Islamic Republic Regime</div>
   <h1>The Architects of Continuity</h1>
@@ -1076,13 +1165,24 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
 </div>
 
 </div><!-- /grid -->
+<footer class="license-footer"><a href="https://xenatisch.github.io/article-figures/network-analysis/architects_of_continuity.html">The Architects of Continuity</a> © 2026 by <a href="https://x.com/Pouriaaa">Pouria Hadjibagheri</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"></footer>
 </div><!-- /page -->
 
 <div id="tip"></div>
 <div id="mob-drawer-overlay"></div>
 <div id="mob-drawer"></div>
+<div id="analytics-consent" class="analytics-consent" role="dialog" aria-label="Analytics consent">
+  <p>Allow anonymous analytics cookies to help improve this page?</p>
+  <div class="analytics-consent-actions">
+    <button type="button" data-consent="allow">Allow</button>
+    <button type="button" data-consent="decline">Decline</button>
+  </div>
+</div>
 <script>
 (function() {
+  var publicationMode = (new URLSearchParams(window.location.search)).has('publication');
+  if (publicationMode) document.body.classList.add('publication-export');
+
   var tip    = document.getElementById('tip');
   var drawer = document.getElementById('mob-drawer');
   var overlay= document.getElementById('mob-drawer-overlay');
@@ -1251,6 +1351,49 @@ h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; 
     if (e.key === 'Escape') clearFixedTip();
   });
 
+})();
+</script>
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.has('publication')) return;
+
+  var consentKey = 'nwAnalyticsConsent';
+  var gaId = 'G-GXFZNMQ7L0';
+  var banner = document.getElementById('analytics-consent');
+  var loaded = false;
+
+  function loadAnalytics() {
+    if (loaded) return;
+    loaded = true;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function(){ dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', gaId);
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId);
+    document.head.appendChild(s);
+  }
+
+  var saved = '';
+  try { saved = localStorage.getItem(consentKey) || ''; } catch (e) {}
+
+  if (saved === 'granted') {
+    loadAnalytics();
+    return;
+  }
+  if (!banner || saved === 'denied') return;
+
+  banner.classList.add('visible');
+  banner.addEventListener('click', function(ev) {
+    var btn = ev.target.closest('button[data-consent]');
+    if (!btn) return;
+    var decision = btn.getAttribute('data-consent') === 'allow' ? 'granted' : 'denied';
+    try { localStorage.setItem(consentKey, decision); } catch (e) {}
+    if (decision === 'granted') loadAnalytics();
+    banner.classList.remove('visible');
+  });
 })();
 </script>
 </body>
